@@ -22,6 +22,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun AreaVerificationScreenContainer(
     onNavigateToVerifyInMap: () -> Unit,
     onNavigateToChooseDislikes: () -> Unit,
+    onNavigateToIntroduce: () -> Unit,
+    onNavigateToSpotList: () -> Unit,
     skippable: Boolean,
     modifier: Modifier = Modifier,
     viewModel: AreaVerificationViewModel = hiltViewModel(creationCallback = { factory: AreaVerificationViewModel.Factory ->
@@ -73,6 +75,8 @@ fun AreaVerificationScreenContainer(
             }
 
             is AreaVerificationSideEffect.NavigateToChooseDislikes -> onNavigateToChooseDislikes()
+            is AreaVerificationSideEffect.NavigateToIntroduce -> onNavigateToIntroduce()
+            is AreaVerificationSideEffect.NavigateToSpotList -> onNavigateToSpotList()
         }
     }
 
