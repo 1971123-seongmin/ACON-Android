@@ -4,6 +4,7 @@ import com.acon.acon.core.model.model.profile.BirthDateStatus
 import com.acon.acon.core.model.model.profile.Profile
 import com.acon.acon.core.model.model.profile.ProfileImageStatus
 import com.acon.acon.core.model.model.profile.SavedSpot
+import com.acon.acon.domain.error.UNSPECIFIED_SERVER_ERROR_CODE
 import com.acon.acon.domain.error.profile.UpdateProfileError
 import com.acon.acon.domain.error.profile.ValidateNicknameError
 import com.acon.acon.domain.repository.ProfileRepository
@@ -270,15 +271,15 @@ class ProfileRepositoryTest {
     companion object {
         @JvmStatic
         fun updateProfileErrorScenarios() = createErrorStream(
-            -1 to UpdateProfileError.AlreadyExistNickname::class,
-            -2 to UpdateProfileError.InvalidNicknameFormat::class,
-            -3 to UpdateProfileError.InvalidBirthDateFormat::class
+            UNSPECIFIED_SERVER_ERROR_CODE to UpdateProfileError.AlreadyExistNickname::class,
+            UNSPECIFIED_SERVER_ERROR_CODE to UpdateProfileError.InvalidNicknameFormat::class,
+            UNSPECIFIED_SERVER_ERROR_CODE to UpdateProfileError.InvalidBirthDateFormat::class
         )
 
         @JvmStatic
         fun validateNicknameErrorScenarios() = createErrorStream(
-            -1 to ValidateNicknameError.InvalidFormat::class,
-            -2 to ValidateNicknameError.AlreadyExist::class
+            UNSPECIFIED_SERVER_ERROR_CODE to ValidateNicknameError.InvalidFormat::class,
+            UNSPECIFIED_SERVER_ERROR_CODE to ValidateNicknameError.AlreadyExist::class
         )
     }
 }
