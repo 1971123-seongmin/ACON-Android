@@ -27,9 +27,6 @@ import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.core.ui.android.showToast
-import com.acon.acon.core.model.model.spot.Spot
-import com.acon.acon.core.model.type.TransportMode
-import com.acon.acon.core.model.type.UserType
 import com.acon.acon.feature.spot.mock.spotListUiStateRestaurantMock
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.getScreenHeight
@@ -41,7 +38,7 @@ private const val MAX_GUEST_AVAILABLE_COUNT = 5
 
 @Composable
 internal fun SpotEmptyView(
-    userType: com.acon.acon.core.model.type.UserType,
+    signInStatus: com.acon.acon.core.model.type.SignInStatus,
     otherSpots: ImmutableList<com.acon.acon.core.model.model.spot.Spot>,
     onSpotClick: (com.acon.acon.core.model.model.spot.Spot, rank: Int) -> Unit,
     onTryFindWay: (com.acon.acon.core.model.model.spot.Spot) -> Unit,
@@ -89,7 +86,7 @@ internal fun SpotEmptyView(
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(top = 60.dp, bottom = 24.dp)
                     )
-                if (index >= MAX_GUEST_AVAILABLE_COUNT && userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                if (index >= MAX_GUEST_AVAILABLE_COUNT && signInStatus == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                     SpotGuestItem(
                         spot = spot,
                         modifier = Modifier
@@ -145,7 +142,7 @@ internal fun SpotEmptyView(
 @Composable
 private fun SpotListEmptyView1Preview() {
     SpotEmptyView(
-        userType = com.acon.acon.core.model.type.UserType.GUEST,
+        signInStatus = com.acon.acon.core.model.type.SignInStatus.GUEST,
         otherSpots = spotListUiStateRestaurantMock.spotList.toImmutableList(),
         onSpotClick = { _, _ -> },
         onTryFindWay = {},
@@ -157,7 +154,7 @@ private fun SpotListEmptyView1Preview() {
 @Composable
 private fun SpotListEmptyView2Preview() {
     SpotEmptyView(
-        userType = com.acon.acon.core.model.type.UserType.GUEST,
+        signInStatus = com.acon.acon.core.model.type.SignInStatus.GUEST,
         otherSpots = listOf<com.acon.acon.core.model.model.spot.Spot>().toImmutableList(),
         onSpotClick = { _, _ -> },
         onTryFindWay = {},

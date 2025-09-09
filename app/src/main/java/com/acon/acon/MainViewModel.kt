@@ -22,8 +22,8 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getUserType().collectLatest {
-                _state.value = state.value.copy(userType = it)
+            userRepository.getSignInStatus().collectLatest {
+                _state.value = state.value.copy(signInStatus = it)
             }
         }
     }
@@ -56,7 +56,7 @@ class MainViewModel @Inject constructor(
 @Immutable
 data class AconAppState(
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
-    val userType: com.acon.acon.core.model.type.UserType = com.acon.acon.core.model.type.UserType.GUEST,
+    val signInStatus: com.acon.acon.core.model.type.SignInStatus = com.acon.acon.core.model.type.SignInStatus.GUEST,
     val showSignInBottomSheet: Boolean = false,
     val showPermissionDialog: Boolean = false,
     val propertyKey: String = "",

@@ -2,7 +2,7 @@ package com.acon.core.data.session
 
 import app.cash.turbine.test
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.core.data.datasource.local.TokenLocalDataSource
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -66,11 +66,11 @@ class SessionHandlerImplTest {
 
         // When & Then
         sessionHandler.getUserType().test {
-            assertEquals(UserType.GUEST, awaitItem(), "초기 상태는 GUEST여야 합니다.")
+            assertEquals(SignInStatus.GUEST, awaitItem(), "초기 상태는 GUEST여야 합니다.")
 
             sessionHandler.completeSignIn(fakeAccessToken, fakeRefreshToken)
 
-            assertEquals(UserType.USER, awaitItem())
+            assertEquals(SignInStatus.USER, awaitItem())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -88,7 +88,7 @@ class SessionHandlerImplTest {
 
         // Then
         val finalUserType = sessionHandler.getUserType().first()
-        assertEquals(UserType.USER, finalUserType)
+        assertEquals(SignInStatus.USER, finalUserType)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -104,7 +104,7 @@ class SessionHandlerImplTest {
 
         // Then
         val finalUserType = sessionHandler.getUserType().first()
-        assertEquals(UserType.GUEST, finalUserType)
+        assertEquals(SignInStatus.GUEST, finalUserType)
     }
 
     @Test
@@ -122,7 +122,7 @@ class SessionHandlerImplTest {
         sessionHandler.getUserType().test {
             sessionHandler.clearSession()
 
-            assertEquals(UserType.GUEST, awaitItem())
+            assertEquals(SignInStatus.GUEST, awaitItem())
 
             cancelAndIgnoreRemainingEvents()
         }

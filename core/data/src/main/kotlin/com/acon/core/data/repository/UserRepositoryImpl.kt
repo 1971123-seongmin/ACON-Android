@@ -28,7 +28,7 @@ class UserRepositoryImpl @Inject constructor(
     private val onboardingRepository: OnboardingRepository
 ) : UserRepository {
 
-    override fun getUserType() = sessionHandler.getUserType()
+    override fun getSignInStatus() = sessionHandler.getUserType()
 
     override suspend fun signIn(
         socialType: SocialPlatform,

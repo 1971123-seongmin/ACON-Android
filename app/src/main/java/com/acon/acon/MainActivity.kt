@@ -59,7 +59,7 @@ import com.acon.acon.core.ui.compose.LocalLocation
 import com.acon.acon.core.ui.compose.LocalRequestLocationPermission
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.LocalSnackbarHostState
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.navigation.AconNavigation
@@ -321,7 +321,7 @@ class MainActivity : ComponentActivity() {
                     LocalSnackbarHostState provides appState.snackbarHostState,
                     LocalNavController provides navController,
                     LocalHazeState provides hazeState,
-                    LocalUserType provides appState.userType,
+                    LocalSignInStatus provides appState.signInStatus,
                     LocalRequestSignIn provides {
                         viewModel.updateShowSignInBottomSheet(true)
                         viewModel.updateAmplPropertyKey(it)

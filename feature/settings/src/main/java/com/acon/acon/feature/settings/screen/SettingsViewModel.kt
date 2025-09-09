@@ -1,6 +1,6 @@
 package com.acon.acon.feature.settings.screen
 
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.core.ui.base.BaseContainerHost
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,11 +17,10 @@ class SettingsViewModel @Inject constructor(
 
     override val container =
         container<SettingsUiState, SettingsSideEffect>(SettingsUiState.Guest) {
-            userRepository.getUserType().collectLatest { userType ->
-                when (userType) {
-                    UserType.GUEST -> reduce { SettingsUiState.Guest }
-                    UserType.USER -> reduce { SettingsUiState.User() }
-                    UserType.ADMIN -> reduce { SettingsUiState.User() }
+            userRepository.getSignInStatus().collectLatest { signInStatus ->
+                when (signInStatus) {
+                    SignInStatus.GUEST -> reduce { SettingsUiState.Guest }
+                    SignInStatus.USER -> reduce { SettingsUiState.User() }
                 }
             }
         }

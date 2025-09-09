@@ -66,7 +66,7 @@ fun ProfileScreenContainerLegacy(
         onNavigateToUploadScreen = onNavigateToUploadScreen
     )
 
-    viewModel.useUserType()
+    viewModel.useSignInStatus()
     viewModel.collectSideEffect {
         when(it) {
             is ProfileUiSideEffectLegacy.OnNavigateToSpotDetailScreen -> { onNavigateToSpotDetailScreen(it.spotId) }

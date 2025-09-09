@@ -40,7 +40,7 @@ import com.acon.acon.core.designsystem.component.button.AconGoogleSignInButton
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.core.ui.compose.getScreenHeight
 import com.acon.acon.core.ui.compose.getScreenWidth
 import com.acon.acon.core.ui.rememberActivityComponentEntryPoint
@@ -81,14 +81,14 @@ fun SignInScreen(
     )
     val logoAnimationState = animateLottieCompositionAsState(composition = composition)
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val deepLinkHandler = LocalDeepLinkHandler.current
 
     LaunchedEffect(Unit) {
         snapshotFlow { logoAnimationState.value }
             .collect { animationValue ->
                 if (animationValue == 1f) {
-                    if(deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                    if(deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                         navigateToSpotListView()
                     } else {
                         onAnimationEnd()

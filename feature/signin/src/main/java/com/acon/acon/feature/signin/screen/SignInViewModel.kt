@@ -4,7 +4,7 @@ import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.analytics.constants.PropertyKeys
 import com.acon.acon.core.model.model.user.VerificationStatus
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.UserRepository
@@ -25,7 +25,7 @@ class SignInViewModel @Inject constructor(
         container(initialState = SignInUiState.SignIn())
 
     fun signIn() = intent {
-        if (userType.value == UserType.GUEST) {
+        if (signInStatus.value == SignInStatus.GUEST) {
             reduce {
                 SignInUiState.SignIn(showSignInInfo = true)
             }
@@ -41,8 +41,8 @@ class SignInViewModel @Inject constructor(
                 }
             }
         }
-        userType.collectLatest {
-            if (it == UserType.GUEST) {
+        signInStatus.collectLatest {
+            if (it == SignInStatus.GUEST) {
                 reduce {
                     SignInUiState.SignIn(showSignInInfo = true)
                 }

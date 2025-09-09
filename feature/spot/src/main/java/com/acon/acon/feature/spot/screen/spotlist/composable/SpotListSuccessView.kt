@@ -63,7 +63,7 @@ private const val MAX_GUEST_AVAILABLE_COUNT = 5
 internal fun SpotListSuccessView(
     pagerState: PagerState,
     state: SpotListUiStateV2.Success,
-    userType: com.acon.acon.core.model.type.UserType,
+    signInStatus: com.acon.acon.core.model.type.SignInStatus,
     onSpotClick: (com.acon.acon.core.model.model.spot.Spot, rank: Int) -> Unit,
     onTryFindWay: (com.acon.acon.core.model.model.spot.Spot) -> Unit,
     itemHeightPx: Float,
@@ -90,7 +90,7 @@ internal fun SpotListSuccessView(
 
     if (state.transportMode == com.acon.acon.core.model.type.TransportMode.BIKING) {
         SpotEmptyView(
-            userType = userType,
+            signInStatus = signInStatus,
             otherSpots = state.spotList.toImmutableList(),
             onSpotClick = onSpotClick,
             onTryFindWay = onTryFindWay,
@@ -235,7 +235,7 @@ internal fun SpotListSuccessView(
                     )
                 }
                 if (spot != null) {
-                    if (page >= MAX_GUEST_AVAILABLE_COUNT && userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                    if (page >= MAX_GUEST_AVAILABLE_COUNT && signInStatus == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                         SpotGuestItem(
                             spot = spot,
                             onItemClick = { onSignInRequired("click_locked_detail_guest?") },
