@@ -68,6 +68,7 @@ import com.acon.acon.update.AppUpdateHandler
 import com.acon.acon.update.AppUpdateHandlerImpl
 import com.acon.acon.update.UpdateState
 import com.acon.core.social.client.GoogleAuthClient
+import com.acon.core.social.di.AuthClientEntryPoint
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -341,7 +342,7 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest = { viewModel.updateShowSignInBottomSheet(false) },
                             onGoogleSignIn = {
                                 scope.launch {
-                                    val client = activityComponentEntryPoint<GoogleAuthClient>()
+                                    val client = activityComponentEntryPoint<AuthClientEntryPoint>().googleAuthClient()
                                     val code = client.getCredentialCode() ?: return@launch
 
                                     userRepository.signIn(client.platform, code)
