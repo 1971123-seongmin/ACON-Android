@@ -4,6 +4,7 @@ import com.acon.core.data.api.remote.ProfileApi
 import com.acon.core.data.dto.request.profile.UpdateProfileRequest
 import com.acon.core.data.dto.response.profile.ProfileResponse
 import com.acon.core.data.dto.response.profile.SavedSpotResponse
+import com.acon.core.data.dto.response.profile.SavedSpotsResponse
 import io.mockk.MockKVerificationScope
 import io.mockk.Ordering
 import io.mockk.coEvery
@@ -130,22 +131,24 @@ class ProfileRemoteDataSourceTest {
     @Test
     fun `getSavedSpots()는 서버로부터 저장한 장소를 가져와 그대로 반환한다`() = runTest {
         // Given
-        val expectedSavedSpotsResponse = listOf(
-            SavedSpotResponse(
-                spotId = 1,
-                spotName = "Spot name1",
-                spotThumbnail = "Thumbnail Image Url1"
-            ),
-            SavedSpotResponse(
-                spotId = 2,
-                spotName = "Spot name2",
-                spotThumbnail = "Thumbnail Image Url2"
-            ),
-            SavedSpotResponse(
-                spotId = 3,
-                spotName = "Spot name3",
-                spotThumbnail = "Thumbnail Image Url3"
-            ),
+        val expectedSavedSpotsResponse = SavedSpotsResponse(
+            listOf(
+                SavedSpotResponse(
+                    spotId = 1,
+                    spotName = "Spot name1",
+                    spotThumbnail = "Thumbnail Image Url1"
+                ),
+                SavedSpotResponse(
+                    spotId = 2,
+                    spotName = "Spot name2",
+                    spotThumbnail = "Thumbnail Image Url2"
+                ),
+                SavedSpotResponse(
+                    spotId = 3,
+                    spotName = "Spot name3",
+                    spotThumbnail = "Thumbnail Image Url3"
+                ),
+            )
         )
         coEvery { profileApi.getSavedSpots() } returns expectedSavedSpotsResponse
 
@@ -154,7 +157,7 @@ class ProfileRemoteDataSourceTest {
 
         // Then
         coVerifyOnce { profileApi.getSavedSpots() }
-        assertEquals(expectedSavedSpotsResponse, actualSavedSpotsResponse)
+        assertEquals(expectedSavedSpotsResponse.savedSpotList, actualSavedSpotsResponse)
     }
 
     @Test
