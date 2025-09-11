@@ -9,5 +9,5 @@ interface ProfileRepository {
     fun getProfile() : Flow<Result<Profile>>
     suspend fun updateProfile(newProfile: Profile) : Result<Unit>
     suspend fun validateNickname(nickname: String) : Result<Unit>
-    suspend fun getSavedSpots() : Result<List<SavedSpot>>
+    suspend fun getSavedSpots() : Flow<Result<List<SavedSpot>>>
 }

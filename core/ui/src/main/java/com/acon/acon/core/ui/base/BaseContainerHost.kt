@@ -12,6 +12,7 @@ import com.acon.acon.core.common.utils.firstNotNull
 import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.ui.compose.LocalLocation
 import com.acon.acon.core.ui.compose.LocalRequestLocationPermission
+import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.LocalSignInStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,13 @@ abstract class BaseContainerHost<STATE : Any, SIDE_EFFECT : Any>() :
 
     private val _signInStatus = MutableStateFlow(SignInStatus.GUEST)
     protected val signInStatus = _signInStatus.asStateFlow()
+
+    protected var onRequestSignIn: ((String) -> Unit)? = null
+
+    @Composable
+    fun initOnRequestSignIn() {
+        onRequestSignIn = LocalRequestSignIn.current
+    }
 
     @Composable
     fun requestLocationPermission() {

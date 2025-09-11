@@ -152,7 +152,7 @@ fun AconNavigation(
 
             uploadNavigation(navController)
 
-            profileNavigationLegacy(navController, snackbarHostState)
+            profileNavigationLegacy(navController)
 
             settingsNavigation(navController)
         }

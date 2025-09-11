@@ -14,6 +14,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.orbitmvi.orbit.test.test
@@ -51,9 +52,9 @@ class ProfileInfoViewModelTest : BehaviorSpec({
                     coEvery { profileRepository.getProfile() } returns flowOf(
                         Result.success(sampleProfile)
                     )
-                    coEvery { profileRepository.getSavedSpots() } returns Result.success(
+                    coEvery { profileRepository.getSavedSpots() } returns flowOf(Result.success(
                         sampleSavedSpots
-                    )
+                    ))
 
                     Then("상태를 두 모델 값이 반영된 성공 상태로 업데이트한다") {
                         runTest {
@@ -76,7 +77,7 @@ class ProfileInfoViewModelTest : BehaviorSpec({
                             sampleProfile
                         )
                     )
-                    coEvery { profileRepository.getSavedSpots() } returns Result.failure(mockk())
+                    coEvery { profileRepository.getSavedSpots() } returns flowOf(Result.failure(mockk()))
                     Then("상태를 실패로 업데이트한다") {
                         runTest {
                             viewModel.test(this) {
@@ -93,9 +94,9 @@ class ProfileInfoViewModelTest : BehaviorSpec({
                     coEvery { profileRepository.getProfile() } returns flowOf(
                         Result.failure(mockk())
                     )
-                    coEvery { profileRepository.getSavedSpots() } returns Result.success(
+                    coEvery { profileRepository.getSavedSpots() } returns flowOf(Result.success(
                         sampleSavedSpots
-                    )
+                    ))
 
                     Then("상태를 실패로 업데이트한다") {
                         runTest {
@@ -131,6 +132,43 @@ class ProfileInfoViewModelTest : BehaviorSpec({
         userRepository = mockk()
         profileRepository = mockk()
         viewModel = ProfileInfoViewModel(userRepository, profileRepository)
+
+        Given("onSpotListClicked()는") {
+            When("추천 장소 리스트 UI가 눌렸을 때") {
+                Then("추천 장소 리스트 화면 이동 SideEffect를 보낸다") {
+                    runTest {
+                        viewModel.test(this) {
+                            viewModel.onSpotListClicked()
+
+                            expectSideEffect(ProfileInfoSideEffect.NavigateToSpotList)
+                        }
+                    }
+                }
+            }
+        }
+
+        Given("onUploadClicked()는") {
+            When("업로드 UI가 눌렸을 때") {
+                And("비로그인일 경우") {
+                    coEvery { userRepository.getSignInStatus() } returns flowOf(SignInStatus.GUEST)
+                    Then("로그인 요청 함수를 호츨한다") {
+                        // TODO
+                    }
+                }
+                And("로그인일 경우") {
+                    coEvery { userRepository.getSignInStatus() } returns flowOf(SignInStatus.USER)
+                    Then("업로드 화면 이동 SideEffect를 보낸다") {
+                        runTest {
+                            viewModel.test(this) {
+                                viewModel.onUploadClicked()
+
+                                expectSideEffect(ProfileInfoSideEffect.NavigateToUpload)
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         Given("onProfileUpdateClicked()는") {
             When("프로필 수정 UI가 눌렸을 때") {

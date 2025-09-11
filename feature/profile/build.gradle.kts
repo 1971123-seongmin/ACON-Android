@@ -29,6 +29,8 @@ dependencies {
     implementation(libs.androidx.paignig.compose)
 
     testImplementation(libs.bundles.non.android.test)
+    androidTestImplementation(libs.bundles.non.android.test)
+    androidTestImplementation(libs.mockk.android)
     testRuntimeOnly(libs.bundles.junit5.runtime)
     androidTestImplementation(libs.bundles.android.test)
     testImplementation(libs.bundles.orbit.test)

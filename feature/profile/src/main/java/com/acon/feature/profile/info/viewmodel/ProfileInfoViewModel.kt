@@ -9,9 +9,15 @@ import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.syntax.Syntax
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
@@ -23,41 +29,51 @@ class ProfileInfoViewModel @Inject constructor(
 
     override val container: Container<ProfileInfoUiState, ProfileInfoSideEffect> =
         container(ProfileInfoUiState.Loading) {
-            userRepository.getSignInStatus().collectLatest { userType ->
-                when (userType) {
-                    SignInStatus.USER -> {
-                        val savedSpotsResultDeferred = viewModelScope.async {
-                            profileRepository.getSavedSpots()
-                        }
-                        profileRepository.getProfile().collect { profileResult: Result<Profile> ->
-                            val savedSpotsResult = savedSpotsResultDeferred.await()
-                            when {
-                                savedSpotsResult.isFailure || profileResult.isFailure -> {
-                                    reduce {
-                                        ProfileInfoUiState.LoadFailed
-                                    }
-                                }
-                                else -> {
-                                    val savedSpots = savedSpotsResult.getOrNull()!!
-                                    val profile = profileResult.getOrNull()!!
-                                    reduce {
-                                        ProfileInfoUiState.User(
-                                            profile = profile,
-                                            savedSpots = savedSpots
-                                        )
-                                    }
-                                }
+            loadState()
+        }
+
+    suspend fun Syntax<ProfileInfoUiState, ProfileInfoSideEffect>.loadState() {
+        userRepository.getSignInStatus().collectLatest { userType ->
+            when (userType) {
+                SignInStatus.USER -> {
+                    val savedSpotsResultFlowDeferred = viewModelScope.async {
+                        profileRepository.getSavedSpots()
+                    }
+                    val profileResultFlowDeferred = viewModelScope.async {
+                        profileRepository.getProfile()
+                    }
+
+                    combine(
+                        savedSpotsResultFlowDeferred.await(),
+                        profileResultFlowDeferred.await()
+                    ) { savedSpotsResult, profileResult ->
+                        when {
+                            savedSpotsResult.isFailure || profileResult.isFailure -> ProfileInfoUiState.LoadFailed
+                            else -> {
+                                val savedSpots = savedSpotsResult.getOrNull()!!
+                                val profile = profileResult.getOrNull()!!
+                                ProfileInfoUiState.User(
+                                    profile = profile,
+                                    savedSpots = savedSpots
+                                )
                             }
                         }
-                    }
-                    SignInStatus.GUEST -> {
+                    }.collect { uiState ->
                         reduce {
-                            ProfileInfoUiState.Guest
+                            uiState
                         }
+                    }
+                }
+
+                SignInStatus.GUEST -> {
+                    reduce {
+                        ProfileInfoUiState.Guest
                     }
                 }
             }
         }
+    }
+
 
     fun onProfileUpdateClicked() = intent {
         postSideEffect(ProfileInfoSideEffect.NavigateToProfileUpdate)
@@ -83,6 +99,22 @@ class ProfileInfoViewModel @Inject constructor(
     fun onSettingClicked() = intent {
         postSideEffect(ProfileInfoSideEffect.NavigateToSetting)
     }
+
+    fun onSpotListClicked() = intent {
+        postSideEffect(ProfileInfoSideEffect.NavigateToSpotList)
+    }
+
+    fun onUploadClicked() = intent {
+        if (userRepository.getSignInStatus().first() == SignInStatus.GUEST) {
+            onRequestSignIn()
+        } else {
+            postSideEffect(ProfileInfoSideEffect.NavigateToUpload)
+        }
+    }
+
+    fun onRequestSignIn() {
+        super.onRequestSignIn?.invoke("click_upload_guest?")
+    }
 }
 
 sealed interface ProfileInfoUiState {
@@ -102,4 +134,6 @@ sealed interface ProfileInfoSideEffect {
     data class NavigateToSpotDetail(val spotNavigationParam: SpotNavigationParameter) : ProfileInfoSideEffect
     data object NavigateToSavedSpots : ProfileInfoSideEffect
     data object NavigateToSetting : ProfileInfoSideEffect
+    data object NavigateToSpotList : ProfileInfoSideEffect
+    data object NavigateToUpload : ProfileInfoSideEffect
 }

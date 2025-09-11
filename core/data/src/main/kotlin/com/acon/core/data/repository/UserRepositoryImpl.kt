@@ -7,8 +7,10 @@ import com.acon.acon.data.dto.request.DeleteAccountRequest
 import com.acon.acon.domain.error.user.PostSignInError
 import com.acon.acon.domain.error.user.PostSignOutError
 import com.acon.acon.domain.repository.OnboardingRepository
+import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.core.data.cache.ProfileInfoCacheLegacy
+import com.acon.core.data.datasource.local.ProfileLocalDataSource
 import com.acon.core.data.datasource.local.TokenLocalDataSource
 import com.acon.core.data.datasource.remote.UserRemoteDataSource
 import com.acon.core.data.dto.request.SignInRequest
@@ -25,7 +27,8 @@ class UserRepositoryImpl @Inject constructor(
     private val tokenLocalDataSource: TokenLocalDataSource,
     private val sessionHandler: SessionHandler,
     private val profileInfoCacheLegacy: ProfileInfoCacheLegacy,
-    private val onboardingRepository: OnboardingRepository
+    private val onboardingRepository: OnboardingRepository,
+    private val profileLocalDataSource: ProfileLocalDataSource
 ) : UserRepository {
 
     override fun getSignInStatus() = sessionHandler.getUserType()
@@ -69,6 +72,7 @@ class UserRepositoryImpl @Inject constructor(
                 SignOutRequest(refreshToken = refreshToken)
             )
         }.onSuccess {
+            profileLocalDataSource.clearCache()
             onboardingRepository.updateHasVerifiedArea(false)
             onboardingRepository.updateHasTastePreference(false)
             clearSession()

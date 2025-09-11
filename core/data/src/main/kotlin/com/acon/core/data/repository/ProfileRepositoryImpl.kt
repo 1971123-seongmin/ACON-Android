@@ -59,9 +59,26 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSavedSpots(): Result<List<SavedSpot>> {
-        return runCatchingWith {
-            profileRemoteDataSource.getSavedSpots().map { it.toSavedSpot() }
+    override suspend fun getSavedSpots(): Flow<Result<List<SavedSpot>>> {
+        return profileLocalDataSource.getSavedSpots().flatMapLatest { cachedSavedSpots: List<SavedSpot>? ->
+            if (cachedSavedSpots == null) {
+                getSavedSpotsFromRemote()
+            } else {
+                flowOf(Result.success(cachedSavedSpots))
+            }
+        }
+    }
+
+    private fun getSavedSpotsFromRemote(): Flow<Result<List<SavedSpot>>> {
+        return flow {
+            emit(runCatchingWith {
+                val savedSpotResponses = profileRemoteDataSource.getSavedSpots()
+                val savedSpots = savedSpotResponses.map { it.toSavedSpot() }
+
+                profileLocalDataSource.cacheSavedSpots(savedSpots)
+
+                savedSpots
+            })
         }
     }
 }
