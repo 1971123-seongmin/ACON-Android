@@ -15,11 +15,21 @@ open class UpdateProfileError : RootError() {
         override val code: Int = UNSPECIFIED_SERVER_ERROR_CODE
     }
 
+    class InvalidImageType: UpdateProfileError() {
+        override val code = 40045
+    }
+
+    class InternalServerError: UpdateProfileError() {
+        override val code = 50005
+    }
+
     final override fun createErrorInstances(): Array<RootError> {
         return arrayOf(
             AlreadyExistNickname(),
             InvalidNicknameFormat(),
-            InvalidBirthDateFormat()
+            InvalidBirthDateFormat(),
+            InvalidImageType(),
+            InternalServerError()
         )
     }
 }

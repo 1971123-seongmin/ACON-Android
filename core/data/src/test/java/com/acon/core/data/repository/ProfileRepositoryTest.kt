@@ -4,6 +4,7 @@ import com.acon.acon.core.model.model.profile.BirthDateStatus
 import com.acon.acon.core.model.model.profile.Profile
 import com.acon.acon.core.model.model.profile.ProfileImageStatus
 import com.acon.acon.core.model.model.profile.SavedSpot
+import com.acon.acon.core.model.model.profile.SpotThumbnailStatus
 import com.acon.acon.domain.error.UNSPECIFIED_SERVER_ERROR_CODE
 import com.acon.acon.domain.error.profile.UpdateProfileError
 import com.acon.acon.domain.error.profile.ValidateNicknameError
@@ -12,6 +13,7 @@ import com.acon.core.data.assertValidErrorMapping
 import com.acon.core.data.createErrorStream
 import com.acon.core.data.createFakeRemoteError
 import com.acon.core.data.datasource.local.ProfileLocalDataSource
+import com.acon.core.data.datasource.remote.AconAppRemoteDataSource
 import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
 import com.acon.core.data.dto.response.profile.ProfileResponse
 import com.acon.core.data.dto.response.profile.SavedSpotResponse
@@ -20,7 +22,9 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.runs
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -42,11 +46,23 @@ class ProfileRepositoryTest {
     @MockK
     private lateinit var profileLocalDataSource: ProfileLocalDataSource
 
+    @MockK
+    private lateinit var aconAppRemoteDataSource: AconAppRemoteDataSource
+
     private lateinit var profileRepository: ProfileRepository
+
+    private val sampleNewProfile get() = Profile(
+        nickname = "New nickname",
+        birthDate = BirthDateStatus.Specified(LocalDate.of(2000, 1, 1)),
+        image = ProfileImageStatus.Default
+    )
 
     @BeforeEach
     fun setUp() {
-        profileRepository = ProfileRepositoryImpl(profileRemoteDataSource, profileLocalDataSource)
+        profileRepository = ProfileRepositoryImpl(
+            profileRemoteDataSource, profileLocalDataSource, aconAppRemoteDataSource,
+            mockk(relaxed = true)
+        )
     }
 
     @Test
@@ -150,7 +166,7 @@ class ProfileRepositoryTest {
     @Test
     fun `updateProfile()은 서버에 프로필 저장을 성공할 경우, 로컬 캐싱을 업데이트하고 Result(Unit)을 반환한다`() = runTest {
         // Given
-        val sampleNewProfile = getSampleNewProfile()
+        val sampleNewProfile = sampleNewProfile
         val expectedResult = Result.success(Unit)
         coEvery { profileRemoteDataSource.updateProfile(any()) } just runs
         coEvery { profileLocalDataSource.cacheProfile(sampleNewProfile) } just runs
@@ -166,7 +182,7 @@ class ProfileRepositoryTest {
     @Test
     fun `updateProfile()은 서버에 프로필 저장을 실패할 경우, 로컬 캐싱 값을 업데이트하지 않는다`() = runTest {
         // Given
-        val sampleNewProfile = getSampleNewProfile()
+        val sampleNewProfile = sampleNewProfile
 
         coEvery { profileRemoteDataSource.updateProfile(any()) } throws Exception()
 
@@ -184,7 +200,7 @@ class ProfileRepositoryTest {
         expectedErrorClass: KClass<UpdateProfileError>
     ) = runTest {
         // Given
-        val sampleNewProfile = getSampleNewProfile()
+        val sampleNewProfile = sampleNewProfile
 
         val fakeRemoteError = createFakeRemoteError(errorCode)
         coEvery { profileRemoteDataSource.updateProfile(any()) } throws fakeRemoteError
@@ -195,12 +211,6 @@ class ProfileRepositoryTest {
         // Then
         assertValidErrorMapping(actualResult, expectedErrorClass)
     }
-
-    private fun getSampleNewProfile() = Profile(
-        nickname = "New nickname",
-        birthDate = BirthDateStatus.Specified(LocalDate.of(2000, 1, 1)),
-        image = ProfileImageStatus.Default
-    )
 
     @Test
     fun `validateNickname()은 서버로부터 유효성 검사 성공 시 Result(Unit)을 반환한다`() = runTest {
@@ -236,6 +246,24 @@ class ProfileRepositoryTest {
     }
 
     @Test
+    fun `getSavedSpots()는 로컬에 저장된 캐시 값이 있을 경우, 서버 API를 호출하지 않고 캐시 값을 반환한다`() = runTest {
+        // Given
+        val sampleCachedSavedSpots = listOf(
+            SavedSpot(1, "Spot1", SpotThumbnailStatus.Empty),
+            SavedSpot(2, "Spot2", SpotThumbnailStatus.Exist("sample url1")),
+            SavedSpot(3, "Spot3", SpotThumbnailStatus.Exist("sample url2"))
+        )
+        coEvery { profileLocalDataSource.getSavedSpots() } returns flowOf(sampleCachedSavedSpots)
+        val expectedResult = Result.success(sampleCachedSavedSpots)
+
+        // When
+        val actualResult = profileRepository.getSavedSpots().first()
+
+        // Then
+        coVerify(exactly = 0) { profileRemoteDataSource.getSavedSpots() }
+        assertEquals(expectedResult, actualResult)
+    }
+    @Test
     fun `getSavedSpots()는 서버로부터 저장한 장소 응답받기를 성공하면, 모델로 변환하고 Result Wrapping하여 반환한다`() = runTest {
         // Given
         val sampleSavedSpotsResponse = listOf(
@@ -243,12 +271,15 @@ class ProfileRepositoryTest {
             SavedSpotResponse(2, "Spot2", "sample url"),
             SavedSpotResponse(3, "Spot3", "sample url")
         )
+        coEvery { profileLocalDataSource.getSavedSpots() } returns flowOf(null)
+        coEvery { profileLocalDataSource.cacheSavedSpots(any()) } just runs
+
         coEvery { profileRemoteDataSource.getSavedSpots() } returns sampleSavedSpotsResponse
         val sampleSavedSpots = sampleSavedSpotsResponse.map { it.toSavedSpot() }
         val expectedResult = Result.success(sampleSavedSpots)
 
         // When
-        val actualResult = profileRepository.getSavedSpots()
+        val actualResult = profileRepository.getSavedSpots().first()
 
         // Then
         assertEquals(expectedResult, actualResult)
@@ -258,11 +289,12 @@ class ProfileRepositoryTest {
     fun `getSavedSpots()는 서버로부터 저장한 장소 응답받기를 실패하면 발생한 예외를 Result wrapping하여 그대로 전파한다`() = runTest {
         // Given
         val fakeException = Exception()
+        coEvery { profileLocalDataSource.getSavedSpots() } returns flowOf(null)
         coEvery { profileRemoteDataSource.getSavedSpots() } throws fakeException
         val expectedResult = Result.failure<List<SavedSpot>>(fakeException)
 
         // When
-        val actualResult = profileRepository.getSavedSpots()
+        val actualResult = profileRepository.getSavedSpots().first()
 
         // Then
         assertEquals(expectedResult, actualResult)
