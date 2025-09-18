@@ -37,7 +37,7 @@ internal fun BirthDateFieldView(
     modifier: Modifier = Modifier
 ) {
 
-    val validationViewAlpha = when(validationStatus) {
+    val validationResultAlpha = when(validationStatus) {
         BirthDateValidationStatus.Invalid -> 1f
         else -> 0f
     }
@@ -78,8 +78,8 @@ internal fun BirthDateFieldView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 8.dp, top = 4.dp)
-                .alpha(validationViewAlpha).testTag(TestTags.BIRTH_DATE_VALIDATION_VIEW).semantics {
-                    this.testAlpha = validationViewAlpha
+                .alpha(validationResultAlpha).testTag(TestTags.BIRTH_DATE_VALIDATION_VIEW).semantics {
+                    this.testAlpha = validationResultAlpha
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {

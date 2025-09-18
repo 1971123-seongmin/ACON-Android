@@ -89,6 +89,7 @@ internal fun ProfileInfoScreen(
                         onSeeAllTextClick = actions.onSeeAllTextClick,
                         onSavedSpotItemClick = actions.onSavedSpotItemClick,
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                             .padding(top = 42.dp)
                     )
