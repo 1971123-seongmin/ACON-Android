@@ -56,12 +56,12 @@ class ProfileUpdateViewModel @Inject constructor(
             }
         }
 
-    fun onNicknameInputChanged(input: TextFieldValue): Job {
+    fun onNicknameInputChanged(input: TextFieldValue): Job? {
+        if (input.text.length > MAX_NICKNAME_LENGTH)
+            return null
+
         nicknameValidationJob?.cancel()
         nicknameValidationJob = intent {
-            if (input.text.length > MAX_NICKNAME_LENGTH) {
-                return@intent
-            }
 
             val isJustSelection = input.text == state.nicknameInput.text
             if (isJustSelection) {

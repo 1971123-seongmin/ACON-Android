@@ -350,7 +350,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                         Then("해당 입력 전체를 무시한다") {
                             runTest {
                                 viewModel.test(this) {
-                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue).join()
+                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue)?.join()
 
                                     viewModel.getState() shouldBe expectedProfileUpdateState
                                 }
@@ -366,7 +366,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                         Then("닉네임 유효성 상태를 '사용 가능'으로 설정한다") {
                             runTest {
                                 viewModel.test(this) {
-                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue).join()
+                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue)?.join()
 
                                     val state = viewModel.getState()
 
@@ -390,7 +390,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                         Then("닉네임 유효성 상태를 `빈 입력`으로 설정한다") {
                             runTest {
                                 viewModel.test(this) {
-                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue).join()
+                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue)?.join()
 
                                     val state = viewModel.getState()
 
@@ -414,7 +414,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                         Then("닉네임 유효성 상태를 `중복`으로 설정한다") {
                             runTest {
                                 viewModel.test(this) {
-                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue).join()
+                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue)?.join()
 
                                     val state = viewModel.getState()
 
@@ -438,7 +438,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                         Then("닉네임 유효성 상태를 `잘못된 형식`으로 설정한다") {
                             runTest {
                                 viewModel.test(this) {
-                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue).join()
+                                    viewModel.onNicknameInputChanged(sampleNewTextFieldValue)?.join()
 
                                     val state = viewModel.getState()
 
@@ -471,7 +471,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                                 nicknameInput = originalNicknameTextFieldValue
                             )
                         ) {
-                            viewModel.onNicknameInputChanged(expectedNicknameTextFieldValue).join()
+                            viewModel.onNicknameInputChanged(expectedNicknameTextFieldValue)?.join()
                             coVerify(exactly = 0) { validateBirthDateUseCase(any()) }
 
                             expectState {
@@ -751,7 +751,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                     val sampleTextFieldValue = TextFieldValue("acon123")
                     When("나중에 뒤로가기 할 때") {
                         Then("모달을 보여줘야 하는 상태로 설정한다") {
-                            viewModel.onNicknameInputChanged(sampleTextFieldValue).join()
+                            viewModel.onNicknameInputChanged(sampleTextFieldValue)?.join()
 
                             val state = viewModel.getState()
 
