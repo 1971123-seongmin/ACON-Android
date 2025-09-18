@@ -11,5 +11,7 @@ internal object TestTags {
     const val BOTTOM_BAR = "bottom_bar"
 
     /** [com.acon.feature.profile.update.composable.BirthDateFieldView] */
-    const val BIRTH_DATE_VALIDATION_VIEW = "birth_date_validation_view"
+    const val BIRTH_DATE_VALIDATION_RESULT_VIEW = "birth_date_validation_result_view"
+
+    const val NICKNAME
 }

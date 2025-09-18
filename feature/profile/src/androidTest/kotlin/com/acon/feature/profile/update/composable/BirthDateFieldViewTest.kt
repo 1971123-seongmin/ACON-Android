@@ -29,7 +29,7 @@ class BirthDateFieldViewTest {
         }
 
         // When
-        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_VIEW)
+        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_RESULT_VIEW)
 
         // Then
         assertEquals(1f, birthDateValidationViewNode.getAlpha())
@@ -48,7 +48,7 @@ class BirthDateFieldViewTest {
         }
 
         // When
-        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_VIEW)
+        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_RESULT_VIEW)
 
         // Then
         assertEquals(0f, birthDateValidationViewNode.getAlpha())
@@ -67,7 +67,7 @@ class BirthDateFieldViewTest {
         }
 
         // When
-        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_VIEW)
+        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_RESULT_VIEW)
 
         // Then
         assertEquals(0f, birthDateValidationViewNode.getAlpha())
@@ -86,7 +86,7 @@ class BirthDateFieldViewTest {
         }
 
         // When
-        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_VIEW)
+        val birthDateValidationViewNode = composeTestRule.onNodeWithTag(TestTags.BIRTH_DATE_VALIDATION_RESULT_VIEW)
 
         // Then
         assertEquals(0f, birthDateValidationViewNode.getAlpha())

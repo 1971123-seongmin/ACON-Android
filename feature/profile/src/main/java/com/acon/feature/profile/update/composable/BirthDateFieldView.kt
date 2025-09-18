@@ -78,7 +78,7 @@ internal fun BirthDateFieldView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 8.dp, top = 4.dp)
-                .alpha(validationResultAlpha).testTag(TestTags.BIRTH_DATE_VALIDATION_VIEW).semantics {
+                .alpha(validationResultAlpha).testTag(TestTags.BIRTH_DATE_VALIDATION_RESULT_VIEW).semantics {
                     this.testAlpha = validationResultAlpha
                 },
             verticalAlignment = Alignment.CenterVertically
