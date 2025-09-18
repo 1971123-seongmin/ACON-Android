@@ -1,7 +1,9 @@
 package com.acon.acon.feature.profile.composable.screen.bookmark
 
-import com.acon.acon.domain.repository.SpotRepository
+import androidx.compose.runtime.Immutable
+import com.acon.acon.core.model.model.profile.SavedSpot
 import com.acon.acon.core.ui.base.BaseContainerHost
+import com.acon.acon.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -11,26 +13,23 @@ import javax.inject.Inject
 @OptIn(OrbitExperimental::class)
 @HiltViewModel
 class BookmarkViewModel @Inject constructor(
-    private val spotRepository: SpotRepository
+    private val profileRepository: ProfileRepository
 ) : BaseContainerHost<BookmarkUiState, BookmarkUiSideEffect>() {
 
     override val container =  container<BookmarkUiState, BookmarkUiSideEffect>(BookmarkUiState.Loading) {
-        fetchSavedSpotList()
-    }
-
-    private fun fetchSavedSpotList() = intent {
-        delay(800)
-        spotRepository.fetchSavedSpotList().onSuccess {
-            reduce {
-                BookmarkUiState.Success(savedSpotLegacies = it)
-            }
-        }.onFailure {
-            reduce {
-                BookmarkUiState.LoadFailed
+        delay(LOADING_DELAY_MILLIS)
+        profileRepository.getSavedSpots().collect { result ->
+            result.onSuccess {
+                reduce {
+                    BookmarkUiState.Success(savedSpots = it)
+                }
+            }.onFailure {
+                reduce {
+                    BookmarkUiState.LoadFailed
+                }
             }
         }
     }
-
 
     fun navigateToBack() = intent {
         postSideEffect(BookmarkUiSideEffect.OnNavigateToBack)
@@ -41,10 +40,17 @@ class BookmarkViewModel @Inject constructor(
             postSideEffect(BookmarkUiSideEffect.OnNavigateToSpotDetailScreen(spotId))
         }
     }
+
+    companion object {
+        private const val LOADING_DELAY_MILLIS = 800L
+    }
 }
 
 sealed interface BookmarkUiState {
-    data class Success(val savedSpotLegacies: List<com.acon.acon.core.model.model.profile.SavedSpotLegacy>? = emptyList()) : BookmarkUiState
+    @Immutable
+    data class Success(
+        val savedSpots: List<SavedSpot>
+    ) : BookmarkUiState
     data object Loading : BookmarkUiState
     data object LoadFailed : BookmarkUiState
 }

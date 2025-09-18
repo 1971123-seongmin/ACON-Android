@@ -24,10 +24,12 @@ import com.acon.acon.core.designsystem.effect.imageGradientLayer
 import com.acon.acon.core.designsystem.effect.imageGradientTopLayer
 import com.acon.acon.core.designsystem.image.rememberDefaultLoadImageErrorPainter
 import com.acon.acon.core.designsystem.theme.AconTheme
+import com.acon.acon.core.model.model.profile.SavedSpot
+import com.acon.acon.core.model.model.profile.SpotThumbnailStatus
 
 @Composable
 internal fun BookmarkItemLegacy(
-    spot: com.acon.acon.core.model.model.profile.SavedSpotLegacy,
+    spot: SavedSpot,
     onClickSpotItem:() -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -36,57 +38,65 @@ internal fun BookmarkItemLegacy(
             .clip(RoundedCornerShape(8.dp))
             .clickable { onClickSpotItem() }
     ) {
-        if(spot.image.isNotEmpty()) {
-            AsyncImage(
-                model = spot.image,
-                contentDescription = stringResource(R.string.store_background_image_content_description),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .imageGradientTopLayer(),
-                error = rememberDefaultLoadImageErrorPainter()
-            )
+        when(val thumbnailStatus = spot.spotThumbnail) {
+            is SpotThumbnailStatus.Exist -> {
+                AsyncImage(
+                    model = thumbnailStatus.url,
+                    contentDescription = stringResource(R.string.store_background_image_content_description),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imageGradientTopLayer(),
+                    error = rememberDefaultLoadImageErrorPainter()
+                )
 
-            Text(
-                text = if (spot.name.length > 9) spot.name.take(8) + stringResource(R.string.ellipsis) else spot.name,
-                color = AconTheme.color.White,
-                style = AconTheme.typography.Title5,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth()
-                    .padding(top = 20.dp)
-                    .padding(horizontal = 20.dp)
-            )
-        } else {
-            Image(
-                painter = painterResource(R.drawable.ic_bg_no_store_profile),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .imageGradientLayer()
-            )
+                Text(
+                    text = spot.spotName.let { name ->
+                        if (name.length > 9) name.take(8) + "…" else name
+                    },
+                    color = AconTheme.color.White,
+                    style = AconTheme.typography.Title5,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 20.dp)
+                )
+            }
+            is SpotThumbnailStatus.Empty -> {
 
-            Text(
-                text =  if (spot.name.length > 9) spot.name.take(8) + stringResource(R.string.ellipsis) else spot.name,
-                color = AconTheme.color.White,
-                style = AconTheme.typography.Title5,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .padding(top = 20.dp)
-                    .padding(horizontal = 20.dp)
-            )
+                Image(
+                    painter = painterResource(R.drawable.ic_bg_no_store_profile),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imageGradientLayer()
+                )
 
-            Text(
-                text = stringResource(R.string.no_store_image),
-                color = AconTheme.color.Gray50,
-                style = AconTheme.typography.Caption1,
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
+                Text(
+                    text = spot.spotName.let { name ->
+                        if (name.length > 9) name.take(8) + "…" else name
+                    },
+                    color = AconTheme.color.White,
+                    style = AconTheme.typography.Title5,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 20.dp)
+                )
+
+                Text(
+                    text = stringResource(R.string.no_store_image),
+                    color = AconTheme.color.Gray50,
+                    style = AconTheme.typography.Caption1,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
         }
     }
 }
@@ -96,7 +106,7 @@ internal fun BookmarkItemLegacy(
 private fun BookmarkItemPreview() {
     AconTheme {
         BookmarkItemLegacy(
-            spot = com.acon.acon.core.model.model.profile.SavedSpotLegacy(1, "", ""),
+            spot = SavedSpot(0, "샘플", SpotThumbnailStatus.Empty),
             onClickSpotItem = {}
         )
     }

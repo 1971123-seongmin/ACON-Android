@@ -166,7 +166,7 @@ fun BookmarkScreen(
                         .verticalScroll(rememberScrollState())
                         .hazeSource(LocalHazeState.current)
                 ) {
-                    state.savedSpotLegacies?.chunked(2)?.fastForEach { rowItems ->
+                    state.savedSpots.chunked(2)?.fastForEach { rowItems ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

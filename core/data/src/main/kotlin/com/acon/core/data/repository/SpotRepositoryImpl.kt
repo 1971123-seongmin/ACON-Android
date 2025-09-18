@@ -125,6 +125,12 @@ class SpotRepositoryImpl @Inject constructor(
         return runCatchingWith(DeleteBookmarkError()) {
             spotRemoteDataSource.deleteBookmark(spotId)
 
+            val cachedSavedSpots = profileLocalDataSource.getSavedSpots().firstOrNull()
+            if (cachedSavedSpots != null)
+                profileLocalDataSource.cacheSavedSpots(profileRemoteDataSource.getSavedSpots().map {
+                    it.toSavedSpot()
+                })
+
             profileRepositoryLegacy.fetchSavedSpots().onSuccess { fetched ->
                 (profileInfoCacheLegacy.data.value.getOrNull()
                     ?: return@onSuccess).let { profileInfo ->
