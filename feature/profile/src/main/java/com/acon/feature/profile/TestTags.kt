@@ -13,5 +13,6 @@ internal object TestTags {
     /** [com.acon.feature.profile.update.composable.BirthDateFieldView] */
     const val BIRTH_DATE_VALIDATION_RESULT_VIEW = "birth_date_validation_result_view"
 
-    const val NICKNAME
+    /** [com.acon.feature.profile.update.composable.NicknameFieldView] */
+    const val NICKNAME_VALIDATION_RESULT_VIEW = "nickname_validation_result_view"
 }

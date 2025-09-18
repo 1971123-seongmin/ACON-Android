@@ -358,7 +358,7 @@ internal fun ProfileModScreenLegacy(
                                 horizontalArrangement = Arrangement.Start
                             ) {
                                 Text(
-                                    text = stringResource(R.string.nickname_birthday_title),
+                                    text = stringResource(R.string.birthdate_field_title),
                                     style = AconTheme.typography.Title4,
                                     color = AconTheme.color.White,
                                     fontWeight = FontWeight.SemiBold
