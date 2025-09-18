@@ -3,6 +3,7 @@ package com.acon.acon.core.designsystem.component.textfield.v2
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -33,6 +34,7 @@ fun AconOutlinedTextField(
         width = 1.dp,
         color = AconTheme.color.GlassWhiteDefault
     ),
+    innerPadding: PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 12.dp),
     backgroundColor: Color = AconTheme.color.Gray900,
     textStyle: TextStyle = AconTheme.typography.Body1.copy(fontWeight = FontWeight.Normal, color = AconTheme.color.White),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -55,7 +57,59 @@ fun AconOutlinedTextField(
                 border = border,
                 shape = shape
             )
-            .padding(horizontal = 10.dp, vertical = 12.dp),
+            .padding(innerPadding),
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        singleLine = false,
+        maxLines = maxLines,
+        minLines = minLines,
+        visualTransformation = visualTransformation,
+        onTextLayout = onTextLayout,
+        cursorBrush = SolidColor(AconTheme.color.Action)
+    ) { innerTextField ->
+        decorationBox(innerTextField)
+    }
+}
+
+@Composable
+fun AconOutlinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    shape: Shape = RoundedCornerShape(8.dp),
+    border: BorderStroke = BorderStroke(
+        width = 1.dp,
+        color = AconTheme.color.GlassWhiteDefault
+    ),
+    innerPadding: PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 12.dp),
+    backgroundColor: Color = AconTheme.color.Gray900,
+    textStyle: TextStyle = AconTheme.typography.Body1.copy(fontWeight = FontWeight.Normal, color = AconTheme.color.White),
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit = @Composable { innerTextField -> innerTextField() }
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .background(
+                color = backgroundColor,
+                shape = shape
+            )
+            .border(
+                border = border,
+                shape = shape
+            )
+            .padding(innerPadding),
         enabled = enabled,
         readOnly = readOnly,
         textStyle = textStyle,
