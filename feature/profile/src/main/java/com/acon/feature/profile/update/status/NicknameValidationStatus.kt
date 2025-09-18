@@ -6,4 +6,5 @@ sealed interface NicknameValidationStatus {
     data object AlreadyExist: NicknameValidationStatus
     data object Empty: NicknameValidationStatus
     data object InvalidFormat: NicknameValidationStatus
+    data object Loading: NicknameValidationStatus
 }
