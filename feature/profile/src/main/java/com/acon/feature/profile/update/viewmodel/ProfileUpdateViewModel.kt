@@ -122,7 +122,7 @@ class ProfileUpdateViewModel @Inject constructor(
                 }
             } else if (input.text.length in 1 until 8) {
                 reduce {
-                    state.copy(birthDateValidationStatus = BirthDateValidationStatus.Idle)
+                    state.copy(birthDateValidationStatus = BirthDateValidationStatus.Typing)
                 }
             } else if (input.text.length == 8) {
                 val localDate = input.text.toLocalDate()
@@ -225,19 +225,17 @@ data class ProfileUpdateState(
     val birthDateInput: TextFieldValue = TextFieldValue(""),
     val profileImageUriInput: String? = null,
     val nicknameValidationStatus: NicknameValidationStatus = NicknameValidationStatus.Idle,
-    val birthDateValidationStatus: BirthDateValidationStatus = BirthDateValidationStatus.Valid,
+    val birthDateValidationStatus: BirthDateValidationStatus = BirthDateValidationStatus.Idle,
     val profileImageInputStatus: ProfileImageInputStatus = ProfileImageInputStatus.NotChanged,
     val showImageSelectModal: Boolean = false,
     val showExitModal: Boolean = false,
     val shouldShowExitModal: Boolean = false,
 ) {
     val isSaveEnabled: Boolean
-        get() = (
-                nicknameValidationStatus is NicknameValidationStatus.Available &&
-                        birthDateValidationStatus is BirthDateValidationStatus.Valid) || (
-                profileImageInputStatus is ProfileImageInputStatus.Changed &&
-                        nicknameValidationStatus is NicknameValidationStatus.Idle &&
-                        birthDateValidationStatus is BirthDateValidationStatus.Valid
+        get() = (profileImageInputStatus is ProfileImageInputStatus.NotChanged && (
+                        (nicknameValidationStatus is NicknameValidationStatus.Available && (birthDateValidationStatus is BirthDateValidationStatus.Idle || birthDateValidationStatus is BirthDateValidationStatus.Valid)) ||
+                                (nicknameValidationStatus is NicknameValidationStatus.Idle && (birthDateValidationStatus is BirthDateValidationStatus.Valid))) ||
+                        (profileImageInputStatus is ProfileImageInputStatus.Changed && (nicknameValidationStatus is NicknameValidationStatus.Available || nicknameValidationStatus is NicknameValidationStatus.Idle) && (birthDateValidationStatus is BirthDateValidationStatus.Valid || birthDateValidationStatus is BirthDateValidationStatus.Idle))
                 )
 }
 

@@ -178,42 +178,63 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
             table(
                 headers("테스트 설명", "닉네임 유효성 상태", "생년월일 유효성 상태", "프로필 이미지 입력 상태", "기대 결과"),
                 row(
-                    "닉네임, 생년월일이 유효하고, 생일 입력이 변한 상태",
-                    NicknameValidationStatus.Available,
-                    BirthDateValidationStatus.Valid,
-                    ProfileImageInputStatus.Changed,
-                    true
-                ),
-                row(
-                    "닉네임, 생년월일이 유효하고, 생일 입력이 변하지 않은 상태",
-                    NicknameValidationStatus.Available,
-                    BirthDateValidationStatus.Valid,
-                    ProfileImageInputStatus.NotChanged,
-                    true
-                ),
-                row(
-                    "닉네임 초기 상태, 생년월일 유효, 프로필 이미지 변한 상태",
-                    NicknameValidationStatus.Idle,
-                    BirthDateValidationStatus.Valid,
-                    ProfileImageInputStatus.Changed,
-                    true
-                ),
-                row(
-                    "생년월일 입력 중 상태",
-                    NicknameValidationStatus.Available,
-                    BirthDateValidationStatus.Idle,
-                    ProfileImageInputStatus.Changed,
-                    false
-                ),
-                row(
                     "모두 초기상태",
                     NicknameValidationStatus.Idle,
-                    BirthDateValidationStatus.Valid,
+                    BirthDateValidationStatus.Idle,
                     ProfileImageInputStatus.NotChanged,
                     false
                 ),
                 row(
-                    "생년월일 유효하지 않음",
+                    "닉네임과 생년월일 초기 상태, 프로필 이미지 '변경됨'",
+                    NicknameValidationStatus.Idle,
+                    BirthDateValidationStatus.Idle,
+                    ProfileImageInputStatus.Changed,
+                    true
+                ),
+                row(
+                    "닉네임과 프로필 이미지 초기 상태, 생일 '유효함'",
+                    NicknameValidationStatus.Idle,
+                    BirthDateValidationStatus.Valid,
+                    ProfileImageInputStatus.NotChanged,
+                    true
+                ),
+                row(
+                    "생년월일과 프로필 이미지 초기 상태, 닉네임 '사용 가능'",
+                    NicknameValidationStatus.Available,
+                    BirthDateValidationStatus.Idle,
+                    ProfileImageInputStatus.NotChanged,
+                    true
+                ),
+                row(
+                    "닉네임 '사용 가능', 생년월일 '유효', 생일 입력 '변경 안 됨'",
+                    NicknameValidationStatus.Available,
+                    BirthDateValidationStatus.Valid,
+                    ProfileImageInputStatus.NotChanged,
+                    true
+                ),
+                row(
+                    "닉네임 초기 상태, 생년월일 유효, 프로필 이미지 '변경됨'",
+                    NicknameValidationStatus.Idle,
+                    BirthDateValidationStatus.Valid,
+                    ProfileImageInputStatus.Changed,
+                    true
+                ),
+                row(
+                    "닉네임 '사용 가능', 생년월일 '유효', 프로필 이미지 '변경됨'",
+                    NicknameValidationStatus.Available,
+                    BirthDateValidationStatus.Valid,
+                    ProfileImageInputStatus.Changed,
+                    true
+                ),
+                row(
+                    "생년월일 '입력 중'",
+                    NicknameValidationStatus.Available,
+                    BirthDateValidationStatus.Typing,
+                    ProfileImageInputStatus.Changed,
+                    false
+                ),
+                row(
+                    "생년월일 '유효하지 않음'",
                     NicknameValidationStatus.Available,
                     BirthDateValidationStatus.Invalid,
                     ProfileImageInputStatus.Changed,
@@ -241,28 +262,21 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                     false
                 ),
                 row(
-                    "닉네임 비어있음",
+                    "닉네임 '비어있음'",
                     NicknameValidationStatus.Empty,
                     BirthDateValidationStatus.Valid,
                     ProfileImageInputStatus.Changed,
                     false
                 ),
                 row(
-                    "닉네임 초기 상태, 프로필 이미지 안 변한 상태",
-                    NicknameValidationStatus.Idle,
-                    BirthDateValidationStatus.Valid,
-                    ProfileImageInputStatus.NotChanged,
-                    false
-                ),
-                row(
-                    "닉네임, 생년월일 유효하지 않고, 프로필 이미지 변한 상태",
+                    "닉네임, 생년월일 '유효하지 않음', 프로필 이미지 '변경됨'",
                     NicknameValidationStatus.Empty,
                     BirthDateValidationStatus.Invalid,
                     ProfileImageInputStatus.Changed,
                     false
                 ),
                 row(
-                    "닉네임, 생년월일 유효하지 않고, 프로필 이미지 안 변한 상태",
+                    "닉네임, 생년월일 '유효하지 않음', 프로필 이미지 '변경 안 됨'",
                     NicknameValidationStatus.Empty,
                     BirthDateValidationStatus.Invalid,
                     ProfileImageInputStatus.NotChanged,
@@ -505,7 +519,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                     }
                 }
                 And("입력이 8자리로 완성되지 않았다면") {
-                    Then("생년월일 입력 유효성 상태는 IDLE이다") {
+                    Then("생년월일 입력 유효성 상태는 '입력 중'이다") {
                         runTest {
                             viewModel.test(
                                 this, ProfileUpdateState(
@@ -517,7 +531,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
 
                                 val state = viewModel.getState()
 
-                                state.birthDateValidationStatus shouldBe BirthDateValidationStatus.Idle
+                                state.birthDateValidationStatus shouldBe BirthDateValidationStatus.Typing
 
                                 cancelAndIgnoreRemainingItems()
                             }
