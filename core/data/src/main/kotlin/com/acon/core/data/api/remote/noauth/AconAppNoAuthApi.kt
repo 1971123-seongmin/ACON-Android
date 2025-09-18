@@ -15,7 +15,7 @@ interface AconAppNoAuthApi {
         @Query("platform") platform: String = "android"
     ): ShouldUpdateResponse
 
-    @POST("/admin/images/presigned-url")
+    @POST("/api/v1/images/presigned-url")
     suspend fun getPresignedUrl(
         @Body request: GetPresignedUrlRequest
     ): PresignedUrlResponse

@@ -3,18 +3,21 @@ package com.acon.core.data.dto.request.profile
 import com.acon.acon.core.model.model.profile.BirthDateStatus
 import com.acon.acon.core.model.model.profile.Profile
 import com.acon.acon.core.model.model.profile.ProfileImageStatus
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UpdateProfileRequest(
-    val nickname: String,
-    val birthDate: String?,
-    val image: String?
+    @SerialName("nickname") val nickname: String,
+    @SerialName("birthDate") val birthDate: String?,
+    @SerialName("profileImage") val image: String?
 )
 
 fun Profile.toUpdateProfileRequest() : UpdateProfileRequest {
     val requestNickname = nickname
     val requestBirthDate: String? = when(birthDate) {
         is BirthDateStatus.Specified -> with((birthDate as BirthDateStatus.Specified).date) {
-            "$year.$month.$dayOfMonth"
+            "$year.${monthValue.toString().padStart(2, '0')}.$dayOfMonth"
         }
         BirthDateStatus.NotSpecified -> null
     }
