@@ -34,7 +34,9 @@ internal fun BirthDateFieldView(
     input: TextFieldValue,
     onInputChange: (TextFieldValue) -> Unit,
     validationStatus: BirthDateValidationStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
+    keyboardActions: androidx.compose.foundation.text.KeyboardActions = androidx.compose.foundation.text.KeyboardActions.Default,
 ) {
 
     val validationResultAlpha = when(validationStatus) {
@@ -66,9 +68,10 @@ internal fun BirthDateFieldView(
             value = input,
             onValueChange = onInputChange,
             visualTransformation = DateVisualTransformation,
-            keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardOptions = keyboardOptions.copy(
                 keyboardType = KeyboardType.Number
             ),
+            keyboardActions = keyboardActions,
             modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth()

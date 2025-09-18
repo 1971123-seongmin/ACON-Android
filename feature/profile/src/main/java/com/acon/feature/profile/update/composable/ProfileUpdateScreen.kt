@@ -5,12 +5,15 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,10 +22,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.core.net.toUri
@@ -46,6 +55,10 @@ internal fun ProfileUpdateScreen(
     actions: ProfileUpdateScreenActions,
     modifier: Modifier = Modifier
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val birthDateFocusRequester = remember { FocusRequester() }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -103,6 +116,12 @@ internal fun ProfileUpdateScreen(
 
     Column(
         modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                })
+            }
     ) {
         AconTopBar(
             leadingIcon = {
@@ -130,13 +149,21 @@ internal fun ProfileUpdateScreen(
         UpdatableProfileImageView(
             imageUri = state.profileImageUriInput?.toUri(),
             onClick = actions.onProfileImageBoxClick,
-            modifier = Modifier.size(80.dp).align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .size(80.dp)
+                .align(Alignment.CenterHorizontally)
         )
 
         NicknameFieldView(
             input = state.nicknameInput,
             onInputChange = actions.onNicknameInputChange,
             validationStatus = state.nicknameValidationStatus,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { birthDateFocusRequester.requestFocus() }
+            ),
             modifier = Modifier
                 .padding(top = 48.dp)
                 .padding(horizontal = 16.dp)
@@ -147,10 +174,20 @@ internal fun ProfileUpdateScreen(
             input = state.birthDateInput,
             onInputChange = actions.onBirthDateInputChange,
             validationStatus = state.birthDateValidationStatus,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                }
+            ),
             modifier = Modifier
                 .padding(top = 24.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
+                .focusRequester(birthDateFocusRequester)
         )
 
         Spacer(modifier = Modifier.weight(1f))

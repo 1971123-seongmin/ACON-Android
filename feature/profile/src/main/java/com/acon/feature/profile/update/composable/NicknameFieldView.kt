@@ -39,7 +39,9 @@ internal fun NicknameFieldView(
     input: TextFieldValue,
     onInputChange: (TextFieldValue) -> Unit,
     validationStatus: NicknameValidationStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
+    keyboardActions: androidx.compose.foundation.text.KeyboardActions = androidx.compose.foundation.text.KeyboardActions.Default,
 ) {
 
     val validationResultAlpha = when(validationStatus) {
@@ -91,6 +93,8 @@ internal fun NicknameFieldView(
         AconOutlinedTextField(
             value = input,
             onValueChange = onInputChange,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth()
