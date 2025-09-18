@@ -16,4 +16,5 @@ dependencies {
     api(projects.core.model)
 
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.ui.test)
 }
