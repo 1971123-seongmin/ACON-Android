@@ -1,4 +1,4 @@
-package com.acon.acon.feature.profile.composable.screen.bookmark
+package com.acon.feature.profile.savedspot.viewmodel
 
 import androidx.compose.runtime.Immutable
 import com.acon.acon.core.model.model.profile.SavedSpot

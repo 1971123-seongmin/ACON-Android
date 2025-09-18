@@ -1,11 +1,11 @@
-package com.acon.acon.feature.profile.composable.screen.bookmark.composable
+package com.acon.feature.profile.savedspot.composable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.acon.acon.feature.profile.composable.screen.bookmark.BookmarkUiSideEffect
-import com.acon.acon.feature.profile.composable.screen.bookmark.BookmarkViewModel
+import com.acon.feature.profile.savedspot.viewmodel.BookmarkUiSideEffect
+import com.acon.feature.profile.savedspot.viewmodel.BookmarkViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 

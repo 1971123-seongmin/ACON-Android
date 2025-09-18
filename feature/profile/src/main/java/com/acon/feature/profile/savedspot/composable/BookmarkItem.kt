@@ -1,4 +1,4 @@
-package com.acon.acon.feature.profile.composable.screen.profile.composable
+package com.acon.feature.profile.savedspot.composable
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -28,7 +28,7 @@ import com.acon.acon.core.model.model.profile.SavedSpot
 import com.acon.acon.core.model.model.profile.SpotThumbnailStatus
 
 @Composable
-internal fun BookmarkItemLegacy(
+internal fun BookmarkItem(
     spot: SavedSpot,
     onClickSpotItem:() -> Unit,
     modifier: Modifier = Modifier
@@ -105,7 +105,7 @@ internal fun BookmarkItemLegacy(
 @Composable
 private fun BookmarkItemPreview() {
     AconTheme {
-        BookmarkItemLegacy(
+        BookmarkItem(
             spot = SavedSpot(0, "샘플", SpotThumbnailStatus.Empty),
             onClickSpotItem = {}
         )

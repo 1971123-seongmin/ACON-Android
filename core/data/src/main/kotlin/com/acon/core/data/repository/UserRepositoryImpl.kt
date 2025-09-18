@@ -7,9 +7,7 @@ import com.acon.acon.data.dto.request.DeleteAccountRequest
 import com.acon.acon.domain.error.user.PostSignInError
 import com.acon.acon.domain.error.user.PostSignOutError
 import com.acon.acon.domain.repository.OnboardingRepository
-import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.UserRepository
-import com.acon.core.data.cache.ProfileInfoCacheLegacy
 import com.acon.core.data.datasource.local.ProfileLocalDataSource
 import com.acon.core.data.datasource.local.TokenLocalDataSource
 import com.acon.core.data.datasource.remote.UserRemoteDataSource
@@ -26,7 +24,6 @@ class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource,
     private val tokenLocalDataSource: TokenLocalDataSource,
     private val sessionHandler: SessionHandler,
-    private val profileInfoCacheLegacy: ProfileInfoCacheLegacy,
     private val onboardingRepository: OnboardingRepository,
     private val profileLocalDataSource: ProfileLocalDataSource
 ) : UserRepository {
@@ -96,7 +93,6 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearSession() = runCatchingWith {
-        profileInfoCacheLegacy.clearData()
         sessionHandler.clearSession()
     }
 }

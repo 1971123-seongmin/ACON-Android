@@ -2,10 +2,13 @@ package com.acon.core.data.repository
 
 import android.content.Context
 import androidx.core.net.toUri
+import com.acon.acon.core.model.model.area.Area
 import com.acon.acon.core.model.model.profile.Profile
 import com.acon.acon.core.model.model.profile.ProfileImageStatus
 import com.acon.acon.core.model.model.profile.SavedSpot
 import com.acon.acon.core.model.type.ImageType
+import com.acon.acon.domain.error.area.DeleteVerifiedAreaError
+import com.acon.acon.domain.error.area.ReplaceVerifiedArea
 import com.acon.acon.domain.error.profile.UpdateProfileError
 import com.acon.acon.domain.error.profile.ValidateNicknameError
 import com.acon.acon.domain.repository.ProfileRepository
@@ -116,6 +119,20 @@ class ProfileRepositoryImpl @Inject constructor(
 
                 savedSpots
             })
+        }
+    }
+
+    override suspend fun getVerifiedAreas(): Result<List<Area>> {
+        // TODO - 인증 지역 조회 API Error 처리 안됨
+        return runCatchingWith() {
+            profileRemoteDataSource.getVerifiedAreas().verifiedAreaList
+                .map { it.toVerifiedArea() }
+        }
+    }
+
+    override suspend fun deleteVerifiedArea(verifiedAreaId: Long): Result<Unit> {
+        return runCatchingWith(DeleteVerifiedAreaError()) {
+            profileRemoteDataSource.deleteVerifiedArea(verifiedAreaId)
         }
     }
 }

@@ -10,7 +10,7 @@ import com.acon.acon.core.analytics.constants.PropertyKeys
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.type.spotNavigationParameterNavType
 import com.acon.acon.core.ui.base.BaseContainerHost
-import com.acon.acon.domain.repository.ProfileRepositoryLegacy
+import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.SpotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SpotDetailViewModel @Inject constructor(
     private val spotRepository: SpotRepository,
-    private val profileRepositoryLegacy: ProfileRepositoryLegacy,
+    private val profileRepository: ProfileRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseContainerHost<SpotDetailUiState, SpotDetailSideEffect>() {
 
@@ -83,7 +83,7 @@ class SpotDetailViewModel @Inject constructor(
         // GUEST 인 경우 빈 리스트
         val verifiedAreaListDeferred = viewModelScope.async {
             if (signInStatus.value != com.acon.acon.core.model.type.SignInStatus.GUEST) {
-                profileRepositoryLegacy.fetchVerifiedAreaList()
+                profileRepository.getVerifiedAreas()
             } else {
                 Result.success(emptyList())
             }
