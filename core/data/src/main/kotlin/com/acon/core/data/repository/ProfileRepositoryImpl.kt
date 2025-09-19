@@ -1,7 +1,6 @@
 package com.acon.core.data.repository
 
 import android.content.Context
-import androidx.core.net.toUri
 import com.acon.acon.core.model.model.area.Area
 import com.acon.acon.core.model.model.profile.Profile
 import com.acon.acon.core.model.model.profile.ProfileImageStatus
@@ -10,28 +9,25 @@ import com.acon.acon.core.model.type.ImageType
 import com.acon.acon.domain.error.area.DeleteVerifiedAreaError
 import com.acon.acon.domain.error.profile.UpdateProfileError
 import com.acon.acon.domain.error.profile.ValidateNicknameError
+import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.ProfileRepository
-import com.acon.core.data.stream.DataStream
 import com.acon.core.data.datasource.local.ProfileLocalDataSource
-import com.acon.core.data.datasource.remote.AconAppRemoteDataSource
 import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
 import com.acon.core.data.di.VerifiedArea
-import com.acon.core.data.dto.request.GetPresignedUrlRequest
 import com.acon.core.data.dto.request.profile.toUpdateProfileRequest
 import com.acon.core.data.error.runCatchingWith
+import com.acon.core.data.stream.DataStream
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     private val profileRemoteDataSource: ProfileRemoteDataSource,
     private val profileLocalDataSource: ProfileLocalDataSource,
-    private val aconAppRemoteDataSource: AconAppRemoteDataSource,
+    private val aconAppRepository: AconAppRepository,
     @VerifiedArea private val areaDataStream: DataStream,
     @ApplicationContext private val context: Context
 ) : ProfileRepository {
@@ -66,18 +62,11 @@ class ProfileRepositoryImpl @Inject constructor(
             val imageStatus = newProfile.image
             if (imageStatus is ProfileImageStatus.Custom) {
                 if (imageStatus.url.startsWith("content://")) {
-                    val presignedUrlResponse = aconAppRemoteDataSource.getPresignedUrl(GetPresignedUrlRequest(
-                        imageType = ImageType.PROFILE,
-                        fileName = imageStatus.url
-                    ))
-                    val inputStream = context.contentResolver.openInputStream(imageStatus.url.toUri())
-                    val requestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-                    requestBody?.let {
-                        aconAppRemoteDataSource.uploadFile(presignedUrlResponse.presignedUrl, it)
-                    }
+                    val uploadUrlResult = aconAppRepository.uploadImage(ImageType.PROFILE, imageStatus.url)
+                    val fileUrl = uploadUrlResult.getOrThrow()
 
                     profileToUpdate = newProfile.copy(
-                        image = ProfileImageStatus.Custom(presignedUrlResponse.fileUrl)
+                        image = ProfileImageStatus.Custom(fileUrl)
                     )
                 } else {
                     profileToUpdate = newProfile
