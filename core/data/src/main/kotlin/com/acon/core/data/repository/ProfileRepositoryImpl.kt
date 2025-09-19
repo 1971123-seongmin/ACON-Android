@@ -8,14 +8,14 @@ import com.acon.acon.core.model.model.profile.ProfileImageStatus
 import com.acon.acon.core.model.model.profile.SavedSpot
 import com.acon.acon.core.model.type.ImageType
 import com.acon.acon.domain.error.area.DeleteVerifiedAreaError
-import com.acon.acon.domain.error.area.ReplaceVerifiedArea
 import com.acon.acon.domain.error.profile.UpdateProfileError
 import com.acon.acon.domain.error.profile.ValidateNicknameError
 import com.acon.acon.domain.repository.ProfileRepository
-import com.acon.core.data.api.remote.noauth.FileUploadApi
+import com.acon.core.data.stream.DataStream
 import com.acon.core.data.datasource.local.ProfileLocalDataSource
 import com.acon.core.data.datasource.remote.AconAppRemoteDataSource
 import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
+import com.acon.core.data.di.VerifiedArea
 import com.acon.core.data.dto.request.GetPresignedUrlRequest
 import com.acon.core.data.dto.request.profile.toUpdateProfileRequest
 import com.acon.core.data.error.runCatchingWith
@@ -32,6 +32,7 @@ class ProfileRepositoryImpl @Inject constructor(
     private val profileRemoteDataSource: ProfileRemoteDataSource,
     private val profileLocalDataSource: ProfileLocalDataSource,
     private val aconAppRemoteDataSource: AconAppRemoteDataSource,
+    @VerifiedArea private val areaDataStream: DataStream,
     @ApplicationContext private val context: Context
 ) : ProfileRepository {
 
@@ -122,17 +123,19 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getVerifiedAreas(): Result<List<Area>> {
-        // TODO - 인증 지역 조회 API Error 처리 안됨
-        return runCatchingWith() {
-            profileRemoteDataSource.getVerifiedAreas().verifiedAreaList
-                .map { it.toVerifiedArea() }
+    override fun getVerifiedAreas(): Flow<Result<List<Area>>> {
+        return areaDataStream.subscribe {
+            emit(runCatchingWith() {
+                profileRemoteDataSource.getVerifiedAreas().verifiedAreaList
+                    .map { it.toVerifiedArea() }
+            })
         }
     }
 
     override suspend fun deleteVerifiedArea(verifiedAreaId: Long): Result<Unit> {
         return runCatchingWith(DeleteVerifiedAreaError()) {
             profileRemoteDataSource.deleteVerifiedArea(verifiedAreaId)
+            areaDataStream.notifyDataChanged()
         }
     }
 }

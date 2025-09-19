@@ -11,6 +11,6 @@ interface ProfileRepository {
     suspend fun updateProfile(newProfile: Profile) : Result<Unit>
     suspend fun validateNickname(nickname: String) : Result<Unit>
     suspend fun getSavedSpots() : Flow<Result<List<SavedSpot>>>
-    suspend fun getVerifiedAreas(): Result<List<Area>>
+    fun getVerifiedAreas(): Flow<Result<List<Area>>>
     suspend fun deleteVerifiedArea(verifiedAreaId: Long): Result<Unit>
 }

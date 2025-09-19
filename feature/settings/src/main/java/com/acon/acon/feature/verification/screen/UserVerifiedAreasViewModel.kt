@@ -4,6 +4,7 @@ import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.error.area.DeleteVerifiedAreaError
 import com.acon.acon.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
@@ -16,26 +17,31 @@ class UserVerifiedAreasViewModel @Inject constructor(
     private val profileRepository: ProfileRepository
 ) : BaseContainerHost<UserVerifiedAreasUiState, UserVerifiedAreasSideEffect>() {
 
+    private var loadVerifiedAreasJob: Job? = null
+
     override val container: Container<UserVerifiedAreasUiState, UserVerifiedAreasSideEffect> =
         container(UserVerifiedAreasUiState.Loading) {
-            fetchVerifiedAreaList()
+            loadVerifiedAreasJob = loadVerifiedAreas()
         }
 
-    private fun fetchVerifiedAreaList() = intent {
-        profileRepository.getVerifiedAreas()
-            .onSuccess {
+    private fun loadVerifiedAreas() = intent {
+        profileRepository.getVerifiedAreas().collect { result ->
+            result.onSuccess { areas ->
                 reduce {
-                    UserVerifiedAreasUiState.Success(verificationAreaList = it)
+                    UserVerifiedAreasUiState.Success(verificationAreaList = areas)
+                }
+            }.onFailure {
+                reduce {
+                    UserVerifiedAreasUiState.LoadFailed
                 }
             }
-            .onFailure {
-                UserVerifiedAreasUiState.LoadFailed
-            }
+        }
     }
 
     fun retry() = intent {
         reduce { UserVerifiedAreasUiState.Loading }
-        fetchVerifiedAreaList()
+        loadVerifiedAreasJob?.cancel()
+        loadVerifiedAreas()
     }
 
     private fun showAreaDeleteFailDialog() = intent {
@@ -72,9 +78,6 @@ class UserVerifiedAreasViewModel @Inject constructor(
 
     fun deleteVerifiedArea(verifiedAreaId: Long) = intent {
         profileRepository.deleteVerifiedArea(verifiedAreaId)
-            .onSuccess {
-                fetchVerifiedAreaList()
-            }
             .onFailure { error ->
                 when (error) {
                     is DeleteVerifiedAreaError.InvalidVerifiedArea -> {
