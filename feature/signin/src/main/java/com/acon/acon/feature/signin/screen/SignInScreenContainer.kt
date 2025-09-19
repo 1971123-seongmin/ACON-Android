@@ -30,7 +30,7 @@ fun SignInScreenContainer(
         state = state,
         modifier = modifier.fillMaxSize(),
         navigateToSpotListView = viewModel::navigateToSpotListView,
-        onSignInComplete = viewModel::onSignInComplete,
+        onSignInButtonClick = viewModel::onSignInButtonClicked,
         onClickTermsOfUse = viewModel::onClickTermsOfUse,
         onClickPrivacyPolicy = viewModel::onClickPrivacyPolicy,
         onAnimationEnd = viewModel::signIn,
@@ -53,7 +53,7 @@ fun SignInScreenContainer(
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 context.startActivity(intent)
             }
-            is SignInSideEffect.NavigateToOnboarding -> navigateToOnboarding()
+            is SignInSideEffect.NavigateToChooseDislikes -> navigateToOnboarding()
             is SignInSideEffect.NavigateToIntroduce -> navigateToIntroduce()
         }
     }

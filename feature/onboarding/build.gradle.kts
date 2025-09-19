@@ -14,5 +14,7 @@ android {
 
 dependencies {
 
+    implementation(projects.core.map)
+
     implementation(libs.lottie.compose)
 }

@@ -1,5 +1,6 @@
 package com.acon.acon.feature.settings.screen
 
+import com.acon.acon.core.model.type.UserType
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.core.ui.base.BaseContainerHost
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,9 +19,9 @@ class SettingsViewModel @Inject constructor(
         container<SettingsUiState, SettingsSideEffect>(SettingsUiState.Guest) {
             userRepository.getUserType().collectLatest { userType ->
                 when (userType) {
-                    com.acon.acon.core.model.type.UserType.GUEST -> reduce { SettingsUiState.Guest }
-                    com.acon.acon.core.model.type.UserType.USER -> reduce { SettingsUiState.User() }
-                    com.acon.acon.core.model.type.UserType.ADMIN -> reduce { SettingsUiState.User() }
+                    UserType.GUEST -> reduce { SettingsUiState.Guest }
+                    UserType.USER -> reduce { SettingsUiState.User() }
+                    UserType.ADMIN -> reduce { SettingsUiState.User() }
                 }
             }
         }
@@ -62,8 +63,8 @@ class SettingsViewModel @Inject constructor(
         postSideEffect(SettingsSideEffect.NavigateToOnboarding)
     }
 
-    fun onNavigateToLocalVerification() = intent {
-        postSideEffect(SettingsSideEffect.NavigateToLocalVerification)
+    fun onNavigateToUserVerifiedAreas() = intent {
+        postSideEffect(SettingsSideEffect.NavigateToUserVerifiedAreas)
     }
 
     fun onDeleteAccount() = intent {
@@ -87,6 +88,6 @@ sealed interface SettingsSideEffect {
     data object OpenTermOfUse : SettingsSideEffect
     data object OpenPrivatePolicy : SettingsSideEffect
     data object NavigateToOnboarding : SettingsSideEffect
-    data object NavigateToLocalVerification : SettingsSideEffect
+    data object NavigateToUserVerifiedAreas : SettingsSideEffect
     data object NavigateToDeleteAccount : SettingsSideEffect
 }

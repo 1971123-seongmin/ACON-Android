@@ -40,7 +40,6 @@ import com.acon.acon.core.ads_api.LocalSpotListAdProvider
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.common.DeepLinkHandler
-import com.acon.acon.core.common.utils.firstNotNull
 import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.component.bottomsheet.SignInBottomSheet
 import com.acon.acon.core.designsystem.component.dialog.AconPermissionDialog
@@ -52,6 +51,8 @@ import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.core.navigation.LocalNavController
 import com.acon.acon.core.navigation.route.AreaVerificationRoute
 import com.acon.acon.core.navigation.route.SpotRoute
+import com.acon.acon.core.navigation.utils.navigateAndClear
+import com.acon.acon.core.ui.activityComponentEntryPoint
 import com.acon.acon.core.ui.android.launchPlayStore
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
 import com.acon.acon.core.ui.compose.LocalLocation
@@ -60,13 +61,13 @@ import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.LocalSnackbarHostState
 import com.acon.acon.core.ui.compose.LocalUserType
 import com.acon.acon.domain.repository.AconAppRepository
-import com.acon.acon.domain.repository.SocialRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.navigation.AconNavigation
 import com.acon.acon.provider.ads_impl.SpotListAdProvider
 import com.acon.acon.update.AppUpdateHandler
 import com.acon.acon.update.AppUpdateHandlerImpl
 import com.acon.acon.update.UpdateState
+import com.acon.core.social.client.GoogleAuthClient
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -82,12 +83,14 @@ import com.google.android.play.core.install.model.ActivityResult
 import com.google.android.play.core.install.model.InstallStatus
 import dagger.hilt.android.AndroidEntryPoint
 import io.branch.referral.Branch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -97,8 +100,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var socialRepository: SocialRepository
 
     @Inject
     lateinit var userRepository: UserRepository
@@ -126,12 +127,16 @@ class MainActivity : ComponentActivity() {
     }
     private val appUpdateActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {   // Immediate에서는 받을 일 없음
-                Timber.d("유저 업데이트 수락")
-            } else if (result.resultCode == RESULT_CANCELED) {
-                Timber.d("유저 업데이트 거부")
-            } else if (result.resultCode == ActivityResult.RESULT_IN_APP_UPDATE_FAILED) {
-                Timber.d("업데이트 실패")
+            when (result.resultCode) {
+                RESULT_OK -> {   // Immediate에서는 받을 일 없음
+                    Timber.d("유저 업데이트 수락")
+                }
+                RESULT_CANCELED -> {
+                    Timber.d("유저 업데이트 거부")
+                }
+                ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> {
+                    Timber.d("업데이트 실패")
+                }
             }
         }
 
@@ -186,42 +191,43 @@ class MainActivity : ComponentActivity() {
     )
 
     @SuppressLint("MissingPermission")
-    private val currentLocationFlow = callbackFlow<Location> {
-        isLocationPermissionGranted.collect { granted ->
-            if (granted) {
-                val fusedLocationClient =
-                    LocationServices.getFusedLocationProviderClient(this@MainActivity.applicationContext)
-                trySend(
-                    fusedLocationClient.getCurrentLocation(
-                        Priority.PRIORITY_HIGH_ACCURACY,
-                        null
-                    ).await()
-                )
+    val liveLocationFlow = callbackFlow<Location> {
+        val fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(this@MainActivity.applicationContext)
+        trySend(
+            fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                null
+            ).await()
+        )
 
-                val locationRequest = LocationRequest.Builder(3_000).setPriority(
-                    Priority.PRIORITY_HIGH_ACCURACY
-                ).build()
+        val locationRequest = LocationRequest.Builder(3_000).setPriority(
+            Priority.PRIORITY_HIGH_ACCURACY
+        ).build()
 
-                val locationCallback = object : LocationCallback() {
-                    override fun onLocationResult(locationResult: LocationResult) {
-                        for (location in locationResult.locations) {
-                            Timber.d("새 좌표 획득: [${location.latitude}, ${location.longitude}]")
-                            trySend(location)
-                        }
-                    }
-                }
-
-                fusedLocationClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
-
-                awaitClose {
-                    fusedLocationClient.removeLocationUpdates(locationCallback)
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    Timber.d("새 좌표 획득: [${location.latitude}, ${location.longitude}]")
+                    trySend(location)
                 }
             }
         }
+
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+
+        awaitClose {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentLocationFlow = isLocationPermissionGranted.filter { it }.flatMapLatest {
+        liveLocationFlow
     }.stateIn(
         scope = lifecycleScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -335,25 +341,21 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest = { viewModel.updateShowSignInBottomSheet(false) },
                             onGoogleSignIn = {
                                 scope.launch {
-                                    socialRepository.googleSignIn()
-                                        .onSuccess {
-                                            if (it.hasVerifiedArea) {
+                                    val client = activityComponentEntryPoint<GoogleAuthClient>()
+                                    val code = client.getCredentialCode() ?: return@launch
+
+                                    userRepository.signIn(client.platform, code)
+                                        .onSuccess { verificationStatus ->
+                                            if (verificationStatus.hasVerifiedArea) {
                                                 navController.navigate(SpotRoute.SpotList) {
                                                     popUpTo(navController.graph.id) {
                                                         inclusive = true
                                                     }
                                                 }
                                             } else {
-                                                navController.navigate(
-                                                    AreaVerificationRoute.AreaVerification(
-                                                        verifiedAreaId = null,
-                                                        route = "onboarding"
-                                                    )
-                                                ) {
-                                                    popUpTo(navController.graph.id) {
-                                                        inclusive = true
-                                                    }
-                                                }
+                                                navController.navigateAndClear(
+                                                    AreaVerificationRoute.AreaVerification
+                                                )
                                             }
                                             if (appState.propertyKey.isNotBlank()) {
                                                 AconAmplitude.trackEvent(
@@ -361,12 +363,12 @@ class MainActivity : ComponentActivity() {
                                                     property = appState.propertyKey to true
                                                 )
                                             }
-                                            AconAmplitude.setUserId(it.externalUUID)
-                                        }.onFailure {
-
+                                            AconAmplitude.setUserId(verificationStatus.externalUUID)
+                                        }.onFailure { e ->
+                                            Timber.e(e)
                                         }
-                                    viewModel.updateShowSignInBottomSheet(false)
                                 }
+                                viewModel.updateShowSignInBottomSheet(false)
                             }, modifier = Modifier
                         )
                     }

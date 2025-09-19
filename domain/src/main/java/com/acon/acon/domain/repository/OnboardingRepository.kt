@@ -1,12 +1,21 @@
 package com.acon.acon.domain.repository
 
+import com.acon.acon.core.model.model.OnboardingPreferences
 import com.acon.acon.core.model.type.FoodType
 
 interface OnboardingRepository {
-    suspend fun submitOnboardingResult(
-        dislikeFoodList: List<FoodType>
+    suspend fun submitTastePreferenceResult(
+        dislikeFoods: List<FoodType>
     ): Result<Unit>
 
-    suspend fun saveDidOnboarding(didOnboarding: Boolean): Result<Unit>
-    suspend fun getDidOnboarding(): Result<Boolean>
+    suspend fun verifyArea(
+        latitude: Double,
+        longitude: Double
+    ): Result<Unit>
+
+    suspend fun updateHasTastePreference(hasPreference: Boolean): Result<Unit>
+    suspend fun updateShouldShowIntroduce(shouldShow: Boolean): Result<Unit>
+    suspend fun updateHasVerifiedArea(hasVerifiedArea: Boolean): Result<Unit>
+
+    suspend fun getOnboardingPreferences(): Result<OnboardingPreferences>
 }

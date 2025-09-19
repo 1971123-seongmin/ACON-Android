@@ -7,8 +7,8 @@ import com.acon.acon.core.model.model.user.VerificationStatus
 import com.acon.acon.core.model.type.UserType
 import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.repository.OnboardingRepository
-import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.UserRepository
+import com.acon.core.social.client.SocialAuthClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.Container
@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val profileRepository: ProfileRepository,
     private val onboardingRepository: OnboardingRepository,
     private val userRepository: UserRepository
 ) : BaseContainerHost<SignInUiState, SignInSideEffect>() {
@@ -31,14 +30,14 @@ class SignInViewModel @Inject constructor(
                 SignInUiState.SignIn(showSignInInfo = true)
             }
         } else {
-            userRepository.getDidOnboarding().onSuccess { did ->
-                if (!did)
-                    postSideEffect(SignInSideEffect.NavigateToOnboarding)
+            onboardingRepository.getOnboardingPreferences().onSuccess {
+                if(it.hasTastePreference.not())
+                    postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
                 else {
-                    if (onboardingRepository.getDidOnboarding().getOrDefault(true))
-                        postSideEffect(SignInSideEffect.NavigateToSpotListView)
-                    else
+                    if (it.shouldShowIntroduce)
                         postSideEffect(SignInSideEffect.NavigateToIntroduce)
+                    else
+                        postSideEffect(SignInSideEffect.NavigateToSpotListView)
                 }
             }
         }
@@ -52,14 +51,25 @@ class SignInViewModel @Inject constructor(
     }
 
     fun onSkipButtonClicked() = intent {
-        if (onboardingRepository.getDidOnboarding().getOrDefault(true)) {
-            postSideEffect(SignInSideEffect.NavigateToSpotListView)
-        } else {
+        if (onboardingRepository.getOnboardingPreferences().getOrNull()?.shouldShowIntroduce == true) {
             postSideEffect(SignInSideEffect.NavigateToIntroduce)
+        } else {
+            postSideEffect(SignInSideEffect.NavigateToSpotListView)
         }
     }
 
-    fun onSignInComplete(verificationStatus: VerificationStatus) = intent {
+    fun onSignInButtonClicked(socialAuthClient: SocialAuthClient) = intent {
+        val platform = socialAuthClient.platform
+        val code = socialAuthClient.getCredentialCode()
+
+        userRepository.signIn(platform, code ?: return@intent).onSuccess { verificationStatus ->
+            onSignInComplete(verificationStatus)
+        }.onFailure {
+            postSideEffect(SignInSideEffect.ShowToastMessage)
+        }
+    }
+
+    private fun onSignInComplete(verificationStatus: VerificationStatus) = intent {
         AconAmplitude.trackEvent(
             eventName = EventNames.SIGN_IN,
             properties = mapOf(
@@ -69,11 +79,11 @@ class SignInViewModel @Inject constructor(
         if (verificationStatus.hasVerifiedArea.not()) {
             postSideEffect(SignInSideEffect.NavigateToAreaVerification)
         } else if (verificationStatus.hasPreference.not()) {
-            postSideEffect(SignInSideEffect.NavigateToOnboarding)
-        } else if (onboardingRepository.getDidOnboarding().getOrDefault(true)) {
-            postSideEffect(SignInSideEffect.NavigateToSpotListView)
-        } else {
+            postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
+        } else if (onboardingRepository.getOnboardingPreferences().getOrNull()?.shouldShowIntroduce == true) {
             postSideEffect(SignInSideEffect.NavigateToIntroduce)
+        } else {
+            postSideEffect(SignInSideEffect.NavigateToSpotListView)
         }
         AconAmplitude.setUserId(verificationStatus.externalUUID)
     }
@@ -105,7 +115,7 @@ sealed interface SignInSideEffect {
     data object ShowToastMessage : SignInSideEffect
     data object NavigateToSpotListView : SignInSideEffect
     data object NavigateToAreaVerification : SignInSideEffect
-    data object NavigateToOnboarding : SignInSideEffect
+    data object NavigateToChooseDislikes : SignInSideEffect
     data object OnClickTermsOfUse : SignInSideEffect
     data object OnClickPrivacyPolicy : SignInSideEffect
     data object NavigateToIntroduce : SignInSideEffect
