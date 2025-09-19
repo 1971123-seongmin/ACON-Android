@@ -43,9 +43,9 @@ class SpotDetailViewModel @Inject constructor(
 
     override val container =
         container<SpotDetailUiState, SpotDetailSideEffect>(SpotDetailUiState.Loading) {
-            userType.collect {
+            signInStatus.collect {
                 when (it) {
-                    com.acon.acon.core.model.type.UserType.GUEST -> {
+                    com.acon.acon.core.model.type.SignInStatus.GUEST -> {
                         if (spotNavData.isFromDeepLink == true) {
                             fetchedSpotDetail()
                         } else {
@@ -82,7 +82,7 @@ class SpotDetailViewModel @Inject constructor(
 
         // GUEST 인 경우 빈 리스트
         val verifiedAreaListDeferred = viewModelScope.async {
-            if (userType.value != com.acon.acon.core.model.type.UserType.GUEST) {
+            if (signInStatus.value != com.acon.acon.core.model.type.SignInStatus.GUEST) {
                 profileRepositoryLegacy.fetchVerifiedAreaList()
             } else {
                 Result.success(emptyList())

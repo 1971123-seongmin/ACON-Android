@@ -5,7 +5,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.acon.acon.core.common.DeepLinkHandler
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 
 val LocalOnRetry = staticCompositionLocalOf {
     {}
@@ -19,8 +19,8 @@ val LocalSnackbarHostState = staticCompositionLocalOf {
     SnackbarHostState()
 }
 
-val LocalUserType = compositionLocalOf {
-    UserType.GUEST
+val LocalSignInStatus = compositionLocalOf {
+    SignInStatus.GUEST
 }
 
 val LocalRequestSignIn = staticCompositionLocalOf<(propertyKey: String) -> Unit> { // TODO: core navigation 모듈 통합

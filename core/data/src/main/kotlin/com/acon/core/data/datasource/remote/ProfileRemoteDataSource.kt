@@ -31,6 +31,6 @@ class ProfileRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getSavedSpots(): List<SavedSpotResponse> {
-        return profileApi.getSavedSpots()
+        return profileApi.getSavedSpots().savedSpotList
     }
 }

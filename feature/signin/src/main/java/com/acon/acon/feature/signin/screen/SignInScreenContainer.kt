@@ -37,7 +37,7 @@ fun SignInScreenContainer(
         onSkipButtonClick = viewModel::onSkipButtonClicked
     )
 
-    viewModel.useUserType()
+    viewModel.useSignInStatus()
     viewModel.collectSideEffect { sideEffect ->
         when(sideEffect) {
             is SignInSideEffect.ShowToastMessage -> { context.showToast(R.string.sign_in_failed_toast) }

@@ -70,7 +70,7 @@ internal abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindsProfileRepository(
+    abstract fun bindsProfileRepositoryLegacy(
         impl: ProfileRepositoryLegacyImpl
     ): ProfileRepositoryLegacy
 

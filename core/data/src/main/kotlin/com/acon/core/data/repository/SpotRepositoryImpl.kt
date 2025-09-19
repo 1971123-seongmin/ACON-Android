@@ -22,13 +22,18 @@ import com.acon.acon.domain.error.spot.FetchSpotListError
 import com.acon.acon.domain.error.spot.GetSpotDetailInfoError
 import com.acon.acon.domain.repository.ProfileRepositoryLegacy
 import com.acon.acon.domain.repository.SpotRepository
+import com.acon.core.data.datasource.local.ProfileLocalDataSource
+import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class SpotRepositoryImpl @Inject constructor(
     private val spotRemoteDataSource: SpotRemoteDataSource,
     private val profileInfoCacheLegacy: ProfileInfoCacheLegacy,
     private val profileRepositoryLegacy: ProfileRepositoryLegacy,
+    private val profileLocalDataSource: ProfileLocalDataSource,
+    private val profileRemoteDataSource: ProfileRemoteDataSource,
     private val sessionHandler: SessionHandler
 ) : SpotRepository {
 
@@ -100,6 +105,12 @@ class SpotRepositoryImpl @Inject constructor(
     override suspend fun addBookmark(spotId: Long): Result<Unit> {
         return runCatchingWith(AddBookmarkError()) {
             spotRemoteDataSource.addBookmark(AddBookmarkRequest(spotId))
+
+            val cachedSavedSpots = profileLocalDataSource.getSavedSpots().firstOrNull()
+            if (cachedSavedSpots != null)
+                profileLocalDataSource.cacheSavedSpots(profileRemoteDataSource.getSavedSpots().map {
+                    it.toSavedSpot()
+                })
 
             profileRepositoryLegacy.fetchSavedSpots().onSuccess { fetched ->
                 (profileInfoCacheLegacy.data.value.getOrNull()

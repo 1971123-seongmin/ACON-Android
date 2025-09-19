@@ -1,6 +1,6 @@
 package com.acon.core.data.datasource.remote
 
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.core.data.api.remote.auth.SpotAuthApi
 import com.acon.core.data.api.remote.noauth.SpotNoAuthApi
 import com.acon.core.data.dto.request.AddBookmarkRequest
@@ -17,8 +17,8 @@ class SpotRemoteDataSource @Inject constructor(
     private val spotAuthApi: SpotAuthApi
 ) {
 
-    suspend fun fetchSpotList(request: SpotListRequest, userType: UserType): SpotListResponse {
-        return if (userType == UserType.GUEST)
+    suspend fun fetchSpotList(request: SpotListRequest, signInStatus: SignInStatus): SpotListResponse {
+        return if (signInStatus == SignInStatus.GUEST)
             spotNoAuthApi.fetchSpotList(request)
         else spotAuthApi.fetchSpotList(request)
     }

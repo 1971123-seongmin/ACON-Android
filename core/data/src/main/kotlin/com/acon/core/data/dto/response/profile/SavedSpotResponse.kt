@@ -2,11 +2,14 @@ package com.acon.core.data.dto.response.profile
 
 import com.acon.acon.core.model.model.profile.SavedSpot
 import com.acon.acon.core.model.model.profile.SpotThumbnailStatus
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SavedSpotResponse(
-    val spotId: Long,
-    val spotName: String,
-    val spotThumbnail: String?
+    @SerialName("spotId") val spotId: Long,
+    @SerialName("name") val spotName: String,
+    @SerialName("image") val spotThumbnail: String?
 ) {
 
     fun toSavedSpot() : SavedSpot {

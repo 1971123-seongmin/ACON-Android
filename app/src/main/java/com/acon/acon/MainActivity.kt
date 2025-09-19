@@ -59,7 +59,7 @@ import com.acon.acon.core.ui.compose.LocalLocation
 import com.acon.acon.core.ui.compose.LocalRequestLocationPermission
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.LocalSnackbarHostState
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.navigation.AconNavigation
@@ -68,6 +68,7 @@ import com.acon.acon.update.AppUpdateHandler
 import com.acon.acon.update.AppUpdateHandlerImpl
 import com.acon.acon.update.UpdateState
 import com.acon.core.social.client.GoogleAuthClient
+import com.acon.core.social.di.AuthClientEntryPoint
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -321,7 +322,7 @@ class MainActivity : ComponentActivity() {
                     LocalSnackbarHostState provides appState.snackbarHostState,
                     LocalNavController provides navController,
                     LocalHazeState provides hazeState,
-                    LocalUserType provides appState.userType,
+                    LocalSignInStatus provides appState.signInStatus,
                     LocalRequestSignIn provides {
                         viewModel.updateShowSignInBottomSheet(true)
                         viewModel.updateAmplPropertyKey(it)
@@ -341,7 +342,7 @@ class MainActivity : ComponentActivity() {
                             onDismissRequest = { viewModel.updateShowSignInBottomSheet(false) },
                             onGoogleSignIn = {
                                 scope.launch {
-                                    val client = activityComponentEntryPoint<GoogleAuthClient>()
+                                    val client = activityComponentEntryPoint<AuthClientEntryPoint>().googleAuthClient()
                                     val code = client.getCredentialCode() ?: return@launch
 
                                     userRepository.signIn(client.platform, code)

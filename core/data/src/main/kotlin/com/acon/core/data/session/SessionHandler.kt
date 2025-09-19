@@ -2,7 +2,7 @@ package com.acon.core.data.session
 
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.common.IODispatcher
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.core.data.datasource.local.TokenLocalDataSource
 import com.acon.core.data.dto.response.SignInResponse
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +15,7 @@ import javax.inject.Inject
 interface SessionHandler {
     suspend fun clearSession()
     suspend fun completeSignIn(accessToken: String, refreshToken: String)
-    fun getUserType(): Flow<UserType>
+    fun getUserType(): Flow<SignInStatus>
 
     suspend fun onSignInResponse(response: SignInResponse)
 }
@@ -25,31 +25,31 @@ class SessionHandlerImpl @Inject constructor(
     @IODispatcher scope: CoroutineScope
 ) : SessionHandler {
 
-    private val _userType = MutableStateFlow(UserType.GUEST)
-    private val userType = _userType.asStateFlow()
+    private val _signInStatus = MutableStateFlow(SignInStatus.GUEST)
+    private val userType = _signInStatus.asStateFlow()
 
     init {
         scope.launch {
             val accessToken = tokenLocalDataSource.getAccessToken()
             if (accessToken.isNullOrEmpty())
-                _userType.emit(UserType.GUEST)
+                _signInStatus.emit(SignInStatus.GUEST)
             else
-                _userType.emit(UserType.USER)
+                _signInStatus.emit(SignInStatus.USER)
         }
     }
 
-    override fun getUserType(): Flow<UserType> {
+    override fun getUserType(): Flow<SignInStatus> {
         return userType
     }
 
     override suspend fun clearSession() {
         tokenLocalDataSource.removeAllTokens()
-        _userType.value = UserType.GUEST
+        _signInStatus.value = SignInStatus.GUEST
         AconAmplitude.clearUserId()
     }
 
     override suspend fun completeSignIn(accessToken: String, refreshToken: String) {
-        _userType.value = UserType.USER
+        _signInStatus.value = SignInStatus.USER
         tokenLocalDataSource.saveAccessToken(accessToken)
         tokenLocalDataSource.saveRefreshToken(refreshToken)
     }

@@ -43,7 +43,7 @@ import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.feature.profile.composable.screen.profile.ProfileUiStateLegacy
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.core.ui.compose.getScreenHeight
 import dev.chrisbanes.haze.hazeSource
 
@@ -64,7 +64,7 @@ fun ProfileScreenLegacy(
     val admobHeight = (screenHeightDp * (165f / 740f))
     val savedStoreHeight = (screenHeightDp * (200f / 740f))
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val onSignInRequired = LocalRequestSignIn.current
 
     Column(modifier) {
@@ -314,7 +314,7 @@ fun ProfileScreenLegacy(
                     }
 
                     BottomNavType.UPLOAD -> {
-                        if (userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                        if (userType == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                             onSignInRequired("click_upload_guest?")
                         } else {
                             onNavigateToUploadScreen()

@@ -3,7 +3,7 @@ package com.acon.acon.feature.profile.composable.screen.profile
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.acon.acon.domain.repository.ProfileRepositoryLegacy
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.ui.base.BaseContainerHost
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,9 +19,9 @@ class ProfileViewModel @Inject constructor(
 
     override val container =
         container<ProfileUiStateLegacy, ProfileUiSideEffectLegacy>(ProfileUiStateLegacy.Success(com.acon.acon.core.model.model.profile.ProfileInfoLegacy.Empty)) {
-            userType.collect {
+            signInStatus.collect {
                 when(it) {
-                    UserType.GUEST -> reduce { ProfileUiStateLegacy.Guest }
+                    SignInStatus.GUEST -> reduce { ProfileUiStateLegacy.Guest }
                     else -> {
                         profileRepositoryLegacy.fetchProfile().collect { profileInfoResult ->
                             profileInfoResult.onSuccess {

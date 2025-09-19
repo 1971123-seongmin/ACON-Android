@@ -5,7 +5,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,12 +18,11 @@ import com.acon.acon.core.navigation.route.SettingsRoute
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.route.UploadRoute
 import com.acon.acon.feature.profile.composable.screen.bookmark.composable.BookmarkScreenContainer
-import com.acon.acon.feature.profile.composable.screen.profile.composable.ProfileScreenContainerLegacy
 import com.acon.acon.feature.profile.composable.screen.profileMod.composable.ProfileModScreenContainerLegacy
+import com.acon.feature.profile.info.composable.ProfileInfoScreenContainer
 
 internal fun NavGraphBuilder.profileNavigationLegacy(
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState
 ) {
     navigation<ProfileRouteLegacy.Graph>(
         startDestination = ProfileRouteLegacy.ProfileLegacy,
@@ -32,44 +30,30 @@ internal fun NavGraphBuilder.profileNavigationLegacy(
         exitTransition = { ExitTransition.None }
     ) {
         composable<ProfileRouteLegacy.ProfileLegacy> {
-            ProfileScreenContainerLegacy(
-                snackbarHostState = snackbarHostState,
+            ProfileInfoScreenContainer(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(AconTheme.color.Gray900)
                     .statusBarsPadding(),
-                onNavigateToSpotDetailScreen = {
-                    navController.navigate(
-                        SpotRoute.SpotDetail(
-                            com.acon.acon.core.model.model.spot.SpotNavigationParameter(
-                                it,
-                                emptyList(),
-                                null,
-                                null,
-                                null,
-                                true
-                            )
-                        )
-                    )
+                onNavigateToProfileUpdate = {
+                    navController
                 },
-                onNavigateToBookMarkScreen = {
-                    navController.navigate(ProfileRouteLegacy.Bookmark)
+                onNavigateToSpotDetail = {
+                    navController.navigate(SpotRoute.SpotDetail(it))
                 },
-                onNavigateToSpotListScreen = {
+                onNavigateToSavedSpots = {
+
+                },
+                onNavigateToSetting = {
+                    navController.navigate(SettingsRoute.Settings)
+                },
+                onNavigateToSpotList = {
                     navController.popBackStack(
                         route = SpotRoute.SpotList,
                         inclusive = false
                     )
                 },
-                onNavigateToSettingsScreen = { navController.navigate(SettingsRoute.Settings) },
-                onNavigateToProfileEditScreen = {
-                    navController.navigate(
-                        ProfileRouteLegacy.ProfileModLegacy(
-                            null
-                        )
-                    )
-                },
-                onNavigateToUploadScreen = {
+                onNavigateToUpload = {
                     navController.navigate(UploadRoute.Graph)
                 }
             )
