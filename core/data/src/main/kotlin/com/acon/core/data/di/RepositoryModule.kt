@@ -6,7 +6,7 @@ import com.acon.core.data.repository.AconAppRepositoryImpl
 import com.acon.core.data.repository.MapRepositoryImpl
 import com.acon.core.data.repository.MapSearchRepositoryImpl
 import com.acon.core.data.repository.OnboardingRepositoryImpl
-import com.acon.core.data.repository.ProfileRepositoryImpl
+import com.acon.core.data.repository.ProfileRepositoryLegacyImpl
 import com.acon.core.data.repository.SpotRepositoryImpl
 import com.acon.core.data.repository.TimeRepositoryImpl
 import com.acon.core.data.repository.UploadRepositoryImpl
@@ -16,10 +16,12 @@ import com.acon.acon.domain.repository.MapRepository
 import com.acon.acon.domain.repository.MapSearchRepository
 import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.ProfileRepository
+import com.acon.acon.domain.repository.ProfileRepositoryLegacy
 import com.acon.acon.domain.repository.SpotRepository
 import com.acon.acon.domain.repository.TimeRepository
 import com.acon.acon.domain.repository.UploadRepository
 import com.acon.acon.domain.repository.UserRepository
+import com.acon.core.data.repository.ProfileRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -29,6 +31,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+
+    @Singleton
+    @Binds
+    abstract fun bindsProfileRepository(
+        impl: ProfileRepositoryImpl
+    ): ProfileRepository
 
     @Singleton
     @Binds
@@ -63,8 +71,8 @@ internal abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindsProfileRepository(
-        impl: ProfileRepositoryImpl
-    ): ProfileRepository
+        impl: ProfileRepositoryLegacyImpl
+    ): ProfileRepositoryLegacy
 
     @Singleton
     @Binds

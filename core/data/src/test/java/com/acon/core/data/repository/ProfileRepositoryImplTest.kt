@@ -3,12 +3,12 @@ package com.acon.core.data.repository
 import com.acon.acon.domain.error.area.DeleteVerifiedAreaError
 import com.acon.acon.domain.error.area.ReplaceVerifiedArea
 import com.acon.acon.domain.error.profile.SaveSpotError
-import com.acon.acon.domain.error.profile.ValidateNicknameError
+import com.acon.acon.domain.error.profile.ValidateNicknameErrorLegacy
 import com.acon.core.data.assertValidErrorMapping
-import com.acon.core.data.cache.ProfileInfoCache
+import com.acon.core.data.cache.ProfileInfoCacheLegacy
 import com.acon.core.data.createErrorStream
 import com.acon.core.data.createFakeRemoteError
-import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
+import com.acon.core.data.datasource.remote.ProfileRemoteDataSourceLegacy
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
@@ -26,20 +26,20 @@ import kotlin.reflect.KClass
 class ProfileRepositoryImplTest {
 
     @RelaxedMockK
-    lateinit var profileRemoteDataSource: ProfileRemoteDataSource
+    lateinit var profileRemoteDataSourceLegacy: ProfileRemoteDataSourceLegacy
 
     @RelaxedMockK
-    lateinit var profileInfoCache: ProfileInfoCache
+    lateinit var profileInfoCacheLegacy: ProfileInfoCacheLegacy
 
     private lateinit var testScope: TestScope
 
-    lateinit var profileRepositoryImpl: ProfileRepositoryImpl
+    lateinit var profileRepositoryImpl: ProfileRepositoryLegacyImpl
 
     companion object {
         @JvmStatic
         fun validNicknameErrorScenarios() = createErrorStream(
-            40051 to ValidateNicknameError.UnsatisfiedCondition::class,
-            40901 to ValidateNicknameError.AlreadyUsedNickname::class
+            40051 to ValidateNicknameErrorLegacy.UnsatisfiedCondition::class,
+            40901 to ValidateNicknameErrorLegacy.AlreadyUsedNickname::class
         )
         @JvmStatic
         fun saveSpotErrorScenarios() = createErrorStream(
@@ -65,7 +65,7 @@ class ProfileRepositoryImplTest {
     @BeforeEach
     fun setUp() {
         testScope = TestScope()
-        profileRepositoryImpl = ProfileRepositoryImpl(testScope, profileRemoteDataSource, profileInfoCache)
+        profileRepositoryImpl = ProfileRepositoryLegacyImpl(testScope, profileRemoteDataSourceLegacy, profileInfoCacheLegacy)
     }
 
     @AfterEach
@@ -77,11 +77,11 @@ class ProfileRepositoryImplTest {
     @MethodSource("validNicknameErrorScenarios")
     fun `닉네임 유효성 검사 API 실패 시 에러 객체를 반환한다`(
         errorCode: Int,
-        expectedErrorClass: KClass<ValidateNicknameError>
+        expectedErrorClass: KClass<ValidateNicknameErrorLegacy>
     ) = runTest {
         // Given
         val fakeRemoteError = createFakeRemoteError(errorCode)
-        coEvery { profileRemoteDataSource.validateNickname(any()) } throws fakeRemoteError
+        coEvery { profileRemoteDataSourceLegacy.validateNickname(any()) } throws fakeRemoteError
 
         // When
         val result = profileRepositoryImpl.validateNickname("")
@@ -98,7 +98,7 @@ class ProfileRepositoryImplTest {
     ) = runTest {
         // Given
         val fakeRemoteError = createFakeRemoteError(errorCode)
-        coEvery { profileRemoteDataSource.saveSpot(any()) } throws fakeRemoteError
+        coEvery { profileRemoteDataSourceLegacy.saveSpot(any()) } throws fakeRemoteError
 
         // When
         val result = profileRepositoryImpl.saveSpot(0)
@@ -115,7 +115,7 @@ class ProfileRepositoryImplTest {
     ) = runTest {
         // Given
         val fakeRemoteError = createFakeRemoteError(errorCode)
-        coEvery { profileRemoteDataSource.replaceVerifiedArea(any(), any(), any()) } throws fakeRemoteError
+        coEvery { profileRemoteDataSourceLegacy.replaceVerifiedArea(any(), any(), any()) } throws fakeRemoteError
 
         // When
         val result = profileRepositoryImpl.replaceVerifiedArea(0, .0, .0)
@@ -132,7 +132,7 @@ class ProfileRepositoryImplTest {
     ) = runTest {
         // Given
         val fakeRemoteError = createFakeRemoteError(errorCode)
-        coEvery { profileRemoteDataSource.deleteVerifiedArea(any()) } throws fakeRemoteError
+        coEvery { profileRemoteDataSourceLegacy.deleteVerifiedArea(any()) } throws fakeRemoteError
 
         // When
         val result = profileRepositoryImpl.deleteVerifiedArea(0)

@@ -6,9 +6,9 @@ import com.acon.acon.domain.error.spot.FetchMenuBoardsError
 import com.acon.acon.domain.error.spot.FetchRecentNavigationLocationError
 import com.acon.acon.domain.error.spot.FetchSpotListError
 import com.acon.acon.domain.error.spot.GetSpotDetailInfoError
-import com.acon.acon.domain.repository.ProfileRepository
+import com.acon.acon.domain.repository.ProfileRepositoryLegacy
 import com.acon.core.data.assertValidErrorMapping
-import com.acon.core.data.cache.ProfileInfoCache
+import com.acon.core.data.cache.ProfileInfoCacheLegacy
 import com.acon.core.data.createErrorStream
 import com.acon.core.data.createFakeRemoteError
 import com.acon.core.data.datasource.remote.SpotRemoteDataSource
@@ -30,10 +30,10 @@ class SpotRepositoryImplTest {
     lateinit var spotRemoteDataSource: SpotRemoteDataSource
 
     @RelaxedMockK
-    lateinit var profileInfoCache: ProfileInfoCache
+    lateinit var profileInfoCacheLegacy: ProfileInfoCacheLegacy
 
     @RelaxedMockK
-    lateinit var profileRepository: ProfileRepository
+    lateinit var profileRepositoryLegacy: ProfileRepositoryLegacy
 
     @InjectMockKs
     lateinit var spotRepositoryImpl: SpotRepositoryImpl
@@ -78,7 +78,7 @@ class SpotRepositoryImplTest {
     ) = runTest {
         // Given
         val fakeRemoteError = createFakeRemoteError(errorCode)
-        coEvery { spotRemoteDataSource.fetchSpotList(any()) } throws fakeRemoteError
+        coEvery { spotRemoteDataSource.fetchSpotList(any(), any()) } throws fakeRemoteError
 
         // When
         val result = spotRepositoryImpl.fetchSpotList(.0, .0, mockk(relaxed = true))

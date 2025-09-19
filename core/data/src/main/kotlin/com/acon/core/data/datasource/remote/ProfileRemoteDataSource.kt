@@ -1,64 +1,36 @@
 package com.acon.core.data.datasource.remote
 
-import com.acon.core.data.dto.request.UpdateProfileRequest
-import com.acon.core.data.dto.response.profile.PreSignedUrlResponse
+import com.acon.core.data.api.remote.ProfileApi
+import com.acon.core.data.dto.request.profile.UpdateProfileRequest
 import com.acon.core.data.dto.response.profile.ProfileResponse
-import com.acon.core.data.api.remote.auth.ProfileAuthApi
-import com.acon.core.data.dto.request.ReplaceVerifiedAreaRequest
-import com.acon.core.data.dto.request.SaveSpotRequest
-import com.acon.core.data.dto.response.area.VerifiedAreaListResponse
-import retrofit2.Response
+import com.acon.core.data.dto.response.profile.SavedSpotResponse
 import javax.inject.Inject
 
-class ProfileRemoteDataSource @Inject constructor(
-    private val profileAuthApi: ProfileAuthApi
-) {
-    suspend fun fetchProfile(): ProfileResponse {
-        return profileAuthApi.fetchProfile()
-    }
+interface ProfileRemoteDataSource {
 
-    suspend fun getPreSignedUrl(): PreSignedUrlResponse {
-        return profileAuthApi.getPreSignedUrl()
-    }
-
-    suspend fun validateNickname(nickname: String): Response<Unit> {
-        return profileAuthApi.validateNickname(nickname)
-    }
-
-    suspend fun updateProfile(fileName: String, nickname: String, birthday: String?): Response<Unit> {
-        return profileAuthApi.updateProfile(
-            request = UpdateProfileRequest(profileImage = fileName, nickname = nickname, birthDate = formatBirthday(birthday))
-        )
-    }
-
-    suspend fun fetchSavedSpots() = profileAuthApi.fetchSavedSpots()
-    suspend fun saveSpot(saveSpotRequest: SaveSpotRequest) = profileAuthApi.saveSpot(saveSpotRequest)
-
-    suspend fun fetchVerifiedAreaList() : VerifiedAreaListResponse {
-        return profileAuthApi.fetchVerifiedAreaList()
-    }
-
-    suspend fun replaceVerifiedArea(
-        previousVerifiedAreaId: Long,
-        latitude: Double,
-        longitude: Double
-    ) {
-        return profileAuthApi.replaceVerifiedArea(
-            request = ReplaceVerifiedAreaRequest(
-                previousVerifiedAreaId = previousVerifiedAreaId,
-                latitude = latitude,
-                longitude = longitude
-            )
-        )
-    }
-
-    suspend fun deleteVerifiedArea(verifiedAreaId: Long) {
-        return profileAuthApi.deleteVerifiedArea(verifiedAreaId)
-    }
+    suspend fun getProfile() : ProfileResponse
+    suspend fun updateProfile(updateProfileRequest: UpdateProfileRequest)
+    suspend fun validateNickname(nickname: String)
+    suspend fun getSavedSpots() : List<SavedSpotResponse>
 }
 
-private fun formatBirthday(birthday: String?): String? {
-    return birthday?.let {
-        "${it.substring(0, 4)}.${it.substring(4, 6)}.${it.substring(6, 8)}"
+class ProfileRemoteDataSourceImpl @Inject constructor(
+    private val profileApi: ProfileApi
+) : ProfileRemoteDataSource {
+
+    override suspend fun getProfile(): ProfileResponse {
+        return profileApi.getProfile()
+    }
+
+    override suspend fun updateProfile(updateProfileRequest: UpdateProfileRequest) {
+        profileApi.updateProfile(updateProfileRequest)
+    }
+
+    override suspend fun validateNickname(nickname: String) {
+        profileApi.validateNickname(nickname)
+    }
+
+    override suspend fun getSavedSpots(): List<SavedSpotResponse> {
+        return profileApi.getSavedSpots()
     }
 }
