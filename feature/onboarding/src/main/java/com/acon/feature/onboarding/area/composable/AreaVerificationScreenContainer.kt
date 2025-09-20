@@ -82,6 +82,7 @@ fun AreaVerificationScreenContainer(
 
     val navController = LocalNavController.current
     BackHandler {
-        navController.popBackStack()
+        if (!skippable)
+            navController.popBackStack()
     }
 }
