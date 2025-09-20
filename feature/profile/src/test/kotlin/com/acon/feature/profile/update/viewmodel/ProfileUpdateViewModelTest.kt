@@ -472,7 +472,7 @@ class ProfileUpdateViewModelTest : BehaviorSpec({
                             )
                         ) {
                             viewModel.onNicknameInputChanged(expectedNicknameTextFieldValue)?.join()
-                            coVerify(exactly = 0) { validateBirthDateUseCase(any()) }
+                            coVerify(exactly = 0) { validateNicknameUseCase(any()) }
 
                             expectState {
                                 ProfileUpdateState(
