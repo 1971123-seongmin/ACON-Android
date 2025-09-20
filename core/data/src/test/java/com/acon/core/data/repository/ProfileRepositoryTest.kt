@@ -16,6 +16,7 @@ import com.acon.core.data.datasource.remote.AconAppRemoteDataSource
 import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
 import com.acon.core.data.dto.response.profile.ProfileResponse
 import com.acon.core.data.dto.response.profile.SavedSpotResponse
+import com.acon.core.data.stream.DataStream
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -48,6 +49,9 @@ class ProfileRepositoryTest {
     @MockK
     private lateinit var aconAppRemoteDataSource: AconAppRemoteDataSource
 
+    @MockK
+    private lateinit var dataStream: DataStream
+
     private lateinit var profileRepository: ProfileRepository
 
     private val sampleNewProfile get() = Profile(
@@ -59,7 +63,7 @@ class ProfileRepositoryTest {
     @BeforeEach
     fun setUp() {
         profileRepository = ProfileRepositoryImpl(
-            profileRemoteDataSource, profileLocalDataSource, aconAppRemoteDataSource,
+            profileRemoteDataSource, profileLocalDataSource, aconAppRemoteDataSource, dataStream,
             mockk(relaxed = true)
         )
     }

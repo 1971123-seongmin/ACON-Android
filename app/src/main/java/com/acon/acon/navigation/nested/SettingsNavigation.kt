@@ -14,6 +14,7 @@ import com.acon.acon.core.navigation.route.OnboardingRoute
 import com.acon.acon.core.navigation.route.ProfileRoute
 import com.acon.acon.core.navigation.route.SettingsRoute
 import com.acon.acon.core.navigation.route.SignInRoute
+import com.acon.acon.core.navigation.utils.navigateAndClear
 import com.acon.acon.feature.settings.screen.composable.SettingsScreenContainer
 import com.acon.acon.feature.verification.screen.composable.UserVerifiedAreasScreenContainer
 import com.acon.acon.feature.withdraw.screen.composable.DeleteAccountScreenContainer
@@ -44,11 +45,7 @@ internal fun NavGraphBuilder.settingsNavigation(
                     navController.navigate(SettingsRoute.UserVerifiedAreas)
                 },
                 onNavigateToSignInScreen = {
-                    navController.navigate(SignInRoute.SignIn) {
-                        popUpTo(SettingsRoute.Graph) {
-                            inclusive = true
-                        }
-                    }
+                    navController.navigateAndClear(SignInRoute.SignIn)
                 },
                 onNavigateToDeleteAccountScreen = {
                     navController.navigate(SettingsRoute.DeleteAccount)

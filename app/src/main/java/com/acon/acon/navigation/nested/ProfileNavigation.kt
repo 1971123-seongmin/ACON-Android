@@ -2,7 +2,6 @@ package com.acon.acon.navigation.nested
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -12,13 +11,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.acon.acon.core.designsystem.effect.screenDefault
-import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.core.model.model.spot.SpotNavigationParameter
 import com.acon.acon.core.navigation.route.ProfileRoute
 import com.acon.acon.core.navigation.route.SettingsRoute
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.route.UploadRoute
-import com.acon.acon.feature.profile.composable.screen.bookmark.composable.BookmarkScreenContainer
+import com.acon.feature.profile.savedspot.composable.BookmarkScreenContainer
 import com.acon.feature.profile.info.composable.ProfileInfoScreenContainer
 import com.acon.feature.profile.update.composable.ProfileUpdateScreenContainer
 

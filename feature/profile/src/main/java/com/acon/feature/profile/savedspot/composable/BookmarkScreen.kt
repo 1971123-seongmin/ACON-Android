@@ -1,4 +1,4 @@
-package com.acon.acon.feature.profile.composable.screen.bookmark.composable
+package com.acon.feature.profile.savedspot.composable
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,12 +34,9 @@ import com.acon.acon.core.designsystem.component.topbar.AconTopBar
 import com.acon.acon.core.designsystem.effect.LocalHazeState
 import com.acon.acon.core.designsystem.effect.defaultHazeEffect
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.feature.profile.composable.screen.bookmark.BookmarkUiState
-import com.acon.acon.feature.profile.composable.screen.mockSpotList
-import com.acon.acon.feature.profile.composable.screen.profile.composable.BookmarkItemLegacy
-import com.acon.acon.feature.profile.composable.screen.profile.composable.BookmarkSkeletonItemLegacy
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.compose.getScreenHeight
+import com.acon.feature.profile.savedspot.viewmodel.BookmarkUiState
 import dev.chrisbanes.haze.hazeSource
 
 @Composable
@@ -97,7 +94,7 @@ fun BookmarkScreen(
                         .verticalScroll(rememberScrollState())
                         .hazeSource(LocalHazeState.current)
                 ) {
-                    mockSpotList.chunked(2).forEach { rowItems ->
+                    (1..9).chunked(2).forEach { rowItems ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -105,7 +102,7 @@ fun BookmarkScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             rowItems.forEach { spot ->
-                                BookmarkSkeletonItemLegacy(
+                                BookmarkSkeletonItem(
                                     skeletonHeight = skeletonHeight,
                                     modifier = Modifier
                                         .weight(1f)
@@ -166,7 +163,7 @@ fun BookmarkScreen(
                         .verticalScroll(rememberScrollState())
                         .hazeSource(LocalHazeState.current)
                 ) {
-                    state.savedSpotLegacies?.chunked(2)?.fastForEach { rowItems ->
+                    state.savedSpots.chunked(2).fastForEach { rowItems ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -174,7 +171,7 @@ fun BookmarkScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             rowItems.forEach { spot ->
-                                BookmarkItemLegacy(
+                                BookmarkItem(
                                     spot = spot,
                                     onClickSpotItem = { onSpotClick(spot.spotId) },
                                     modifier = Modifier

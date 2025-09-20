@@ -1,11 +1,18 @@
 package com.acon.core.data.repository
 
-import com.acon.acon.core.model.model.profile.SavedSpotLegacy
 import com.acon.acon.core.model.model.spot.Condition
 import com.acon.acon.core.model.model.spot.MenuBoardList
 import com.acon.acon.core.model.model.spot.SpotDetail
 import com.acon.acon.core.model.model.spot.SpotList
-import com.acon.core.data.cache.ProfileInfoCacheLegacy
+import com.acon.acon.domain.error.spot.AddBookmarkError
+import com.acon.acon.domain.error.spot.DeleteBookmarkError
+import com.acon.acon.domain.error.spot.FetchMenuBoardsError
+import com.acon.acon.domain.error.spot.FetchRecentNavigationLocationError
+import com.acon.acon.domain.error.spot.FetchSpotListError
+import com.acon.acon.domain.error.spot.GetSpotDetailInfoError
+import com.acon.acon.domain.repository.SpotRepository
+import com.acon.core.data.datasource.local.ProfileLocalDataSource
+import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
 import com.acon.core.data.datasource.remote.SpotRemoteDataSource
 import com.acon.core.data.dto.request.AddBookmarkRequest
 import com.acon.core.data.dto.request.ConditionRequest
@@ -14,24 +21,12 @@ import com.acon.core.data.dto.request.RecentNavigationLocationRequest
 import com.acon.core.data.dto.request.SpotListRequest
 import com.acon.core.data.error.runCatchingWith
 import com.acon.core.data.session.SessionHandler
-import com.acon.acon.domain.error.spot.AddBookmarkError
-import com.acon.acon.domain.error.spot.DeleteBookmarkError
-import com.acon.acon.domain.error.spot.FetchMenuBoardsError
-import com.acon.acon.domain.error.spot.FetchRecentNavigationLocationError
-import com.acon.acon.domain.error.spot.FetchSpotListError
-import com.acon.acon.domain.error.spot.GetSpotDetailInfoError
-import com.acon.acon.domain.repository.ProfileRepositoryLegacy
-import com.acon.acon.domain.repository.SpotRepository
-import com.acon.core.data.datasource.local.ProfileLocalDataSource
-import com.acon.core.data.datasource.remote.ProfileRemoteDataSource
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class SpotRepositoryImpl @Inject constructor(
     private val spotRemoteDataSource: SpotRemoteDataSource,
-    private val profileInfoCacheLegacy: ProfileInfoCacheLegacy,
-    private val profileRepositoryLegacy: ProfileRepositoryLegacy,
     private val profileLocalDataSource: ProfileLocalDataSource,
     private val profileRemoteDataSource: ProfileRemoteDataSource,
     private val sessionHandler: SessionHandler
@@ -94,14 +89,6 @@ class SpotRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchSavedSpotList(): Result<List<SavedSpotLegacy>> {
-        return runCatchingWith() {
-            spotRemoteDataSource.fetchSavedSpotList().savedSpotResponseLegacyList?.map {
-                it.toSavedSpot()
-            }.orEmpty()
-        }
-    }
-
     override suspend fun addBookmark(spotId: Long): Result<Unit> {
         return runCatchingWith(AddBookmarkError()) {
             spotRemoteDataSource.addBookmark(AddBookmarkRequest(spotId))
@@ -111,13 +98,6 @@ class SpotRepositoryImpl @Inject constructor(
                 profileLocalDataSource.cacheSavedSpots(profileRemoteDataSource.getSavedSpots().map {
                     it.toSavedSpot()
                 })
-
-            profileRepositoryLegacy.fetchSavedSpots().onSuccess { fetched ->
-                (profileInfoCacheLegacy.data.value.getOrNull()
-                    ?: return@onSuccess).let { profileInfo ->
-                    profileInfoCacheLegacy.updateData(profileInfo.copy(savedSpotLegacies = fetched))
-                }
-            }
         }
     }
 
@@ -125,12 +105,11 @@ class SpotRepositoryImpl @Inject constructor(
         return runCatchingWith(DeleteBookmarkError()) {
             spotRemoteDataSource.deleteBookmark(spotId)
 
-            profileRepositoryLegacy.fetchSavedSpots().onSuccess { fetched ->
-                (profileInfoCacheLegacy.data.value.getOrNull()
-                    ?: return@onSuccess).let { profileInfo ->
-                    profileInfoCacheLegacy.updateData(profileInfo.copy(savedSpotLegacies = fetched))
-                }
-            }
+            val cachedSavedSpots = profileLocalDataSource.getSavedSpots().firstOrNull()
+            if (cachedSavedSpots != null)
+                profileLocalDataSource.cacheSavedSpots(profileRemoteDataSource.getSavedSpots().map {
+                    it.toSavedSpot()
+                })
         }
     }
 }

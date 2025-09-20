@@ -1,0 +1,113 @@
+package com.acon.feature.profile.savedspot.composable
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.acon.acon.core.designsystem.R
+import com.acon.acon.core.designsystem.effect.imageGradientLayer
+import com.acon.acon.core.designsystem.effect.imageGradientTopLayer
+import com.acon.acon.core.designsystem.image.rememberDefaultLoadImageErrorPainter
+import com.acon.acon.core.designsystem.theme.AconTheme
+import com.acon.acon.core.model.model.profile.SavedSpot
+import com.acon.acon.core.model.model.profile.SpotThumbnailStatus
+
+@Composable
+internal fun BookmarkItem(
+    spot: SavedSpot,
+    onClickSpotItem:() -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { onClickSpotItem() }
+    ) {
+        when(val thumbnailStatus = spot.spotThumbnail) {
+            is SpotThumbnailStatus.Exist -> {
+                AsyncImage(
+                    model = thumbnailStatus.url,
+                    contentDescription = stringResource(R.string.store_background_image_content_description),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imageGradientTopLayer(),
+                    error = rememberDefaultLoadImageErrorPainter()
+                )
+
+                Text(
+                    text = spot.spotName.let { name ->
+                        if (name.length > 9) name.take(8) + "…" else name
+                    },
+                    color = AconTheme.color.White,
+                    style = AconTheme.typography.Title5,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 20.dp)
+                )
+            }
+            is SpotThumbnailStatus.Empty -> {
+
+                Image(
+                    painter = painterResource(R.drawable.ic_bg_no_store_profile),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imageGradientLayer()
+                )
+
+                Text(
+                    text = spot.spotName.let { name ->
+                        if (name.length > 9) name.take(8) + "…" else name
+                    },
+                    color = AconTheme.color.White,
+                    style = AconTheme.typography.Title5,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                        .padding(top = 20.dp)
+                        .padding(horizontal = 20.dp)
+                )
+
+                Text(
+                    text = stringResource(R.string.no_store_image),
+                    color = AconTheme.color.Gray50,
+                    style = AconTheme.typography.Caption1,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun BookmarkItemPreview() {
+    AconTheme {
+        BookmarkItem(
+            spot = SavedSpot(0, "샘플", SpotThumbnailStatus.Empty),
+            onClickSpotItem = {}
+        )
+    }
+}

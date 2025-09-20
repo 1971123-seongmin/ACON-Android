@@ -1,6 +1,5 @@
 package com.acon.acon.domain.repository
 
-import com.acon.acon.core.model.model.profile.SavedSpotLegacy
 import com.acon.acon.core.model.model.spot.Condition
 import com.acon.acon.core.model.model.spot.MenuBoardList
 import com.acon.acon.core.model.model.spot.SpotDetail
@@ -30,8 +29,6 @@ interface SpotRepository {
     suspend fun fetchSpotDetailFromUser(
         spotId: Long
     ): Result<SpotDetail>
-
-    suspend fun fetchSavedSpotList(): Result<List<SavedSpotLegacy>>
 
     suspend fun addBookmark(
         spotId: Long

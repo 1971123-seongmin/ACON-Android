@@ -17,7 +17,7 @@ fun Profile.toUpdateProfileRequest() : UpdateProfileRequest {
     val requestNickname = nickname
     val requestBirthDate: String? = when(birthDate) {
         is BirthDateStatus.Specified -> with((birthDate as BirthDateStatus.Specified).date) {
-            "$year.${monthValue.toString().padStart(2, '0')}.$dayOfMonth"
+            "%04d.%02d.%02d".format(year, monthValue, dayOfMonth)
         }
         BirthDateStatus.NotSpecified -> null
     }

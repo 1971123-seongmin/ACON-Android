@@ -1,4 +1,4 @@
-package com.acon.acon.feature.profile.composable.screen.profile.composable
+package com.acon.feature.profile.savedspot.composable
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +13,7 @@ import com.acon.acon.core.designsystem.animation.skeleton
 import com.acon.acon.core.designsystem.component.loading.SkeletonItem
 
 @Composable
-fun BookmarkSkeletonItemLegacy(
+fun BookmarkSkeletonItem(
     skeletonHeight: Dp,
     modifier: Modifier = Modifier
 ) {

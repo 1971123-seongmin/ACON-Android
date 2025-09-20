@@ -7,14 +7,16 @@ import androidx.navigation.toRoute
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.analytics.constants.PropertyKeys
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.type.spotNavigationParameterNavType
 import com.acon.acon.core.ui.base.BaseContainerHost
-import com.acon.acon.domain.repository.ProfileRepositoryLegacy
+import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.SpotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
 import javax.annotation.concurrent.Immutable
@@ -24,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SpotDetailViewModel @Inject constructor(
     private val spotRepository: SpotRepository,
-    private val profileRepositoryLegacy: ProfileRepositoryLegacy,
+    private val profileRepository: ProfileRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseContainerHost<SpotDetailUiState, SpotDetailSideEffect>() {
 
@@ -45,7 +47,7 @@ class SpotDetailViewModel @Inject constructor(
         container<SpotDetailUiState, SpotDetailSideEffect>(SpotDetailUiState.Loading) {
             signInStatus.collect {
                 when (it) {
-                    com.acon.acon.core.model.type.SignInStatus.GUEST -> {
+                    SignInStatus.GUEST -> {
                         if (spotNavData.isFromDeepLink == true) {
                             fetchedSpotDetail()
                         } else {
@@ -82,8 +84,8 @@ class SpotDetailViewModel @Inject constructor(
 
         // GUEST 인 경우 빈 리스트
         val verifiedAreaListDeferred = viewModelScope.async {
-            if (signInStatus.value != com.acon.acon.core.model.type.SignInStatus.GUEST) {
-                profileRepositoryLegacy.fetchVerifiedAreaList()
+            if (signInStatus.value != SignInStatus.GUEST) {
+                profileRepository.getVerifiedAreas().firstOrNull()
             } else {
                 Result.success(emptyList())
             }
@@ -94,7 +96,7 @@ class SpotDetailViewModel @Inject constructor(
 
         reduce {
             val isAreaVerified = verifiedAreaListResult
-                .getOrNull()
+                ?.getOrNull()
                 .orEmpty()
                 .isNotEmpty()
 

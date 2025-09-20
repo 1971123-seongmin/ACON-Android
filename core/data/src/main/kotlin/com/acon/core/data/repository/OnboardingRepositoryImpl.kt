@@ -5,8 +5,10 @@ import com.acon.acon.core.model.type.FoodType
 import com.acon.acon.domain.error.onboarding.PostTastePreferenceResultError
 import com.acon.acon.domain.error.onboarding.VerifyAreaError
 import com.acon.acon.domain.repository.OnboardingRepository
+import com.acon.core.data.stream.DataStream
 import com.acon.core.data.datasource.local.OnboardingLocalDataSource
 import com.acon.core.data.datasource.remote.OnboardingRemoteDataSource
+import com.acon.core.data.di.VerifiedArea
 import com.acon.core.data.dto.request.TastePreferenceRequest
 import com.acon.core.data.error.runCatchingWith
 import javax.inject.Inject
@@ -14,6 +16,7 @@ import javax.inject.Inject
 class OnboardingRepositoryImpl @Inject constructor(
     private val onboardingRemoteDataSource: OnboardingRemoteDataSource,
     private val onboardingLocalDataSource: OnboardingLocalDataSource,
+    @VerifiedArea private val areaDataStream: DataStream
 ) : OnboardingRepository {
 
     override suspend fun submitTastePreferenceResult(
@@ -35,6 +38,7 @@ class OnboardingRepositoryImpl @Inject constructor(
             longitude = longitude
         )
         onboardingLocalDataSource.updateHasVerifiedArea(true)
+        areaDataStream.notifyDataChanged()
     }
 
     override suspend fun updateHasTastePreference(hasPreference: Boolean): Result<Unit> {

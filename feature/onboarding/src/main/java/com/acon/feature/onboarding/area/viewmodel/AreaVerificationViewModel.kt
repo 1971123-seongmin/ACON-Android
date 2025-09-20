@@ -2,6 +2,7 @@ package com.acon.feature.onboarding.area.viewmodel
 
 import com.acon.acon.core.model.type.UserActionType
 import com.acon.acon.core.ui.base.BaseContainerHost
+import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.TimeRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -12,6 +13,7 @@ import org.orbitmvi.orbit.viewmodel.container
 @HiltViewModel(assistedFactory = AreaVerificationViewModel.Factory::class)
 class AreaVerificationViewModel @AssistedInject constructor(
     private val timeRepository: TimeRepository,
+    private val onboardingRepository: OnboardingRepository,
     @Assisted private val shouldShowSkipButton: Boolean
 ) : BaseContainerHost<AreaVerificationState, AreaVerificationSideEffect>() {
 
@@ -28,8 +30,18 @@ class AreaVerificationViewModel @AssistedInject constructor(
     }
 
     fun onSkipClicked() = intent {
-        postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
         timeRepository.saveUserActionTime(UserActionType.SKIP_AREA_VERIFICATION, System.currentTimeMillis())
+
+        onboardingRepository.getOnboardingPreferences().onSuccess { pref ->
+            if (pref.hasTastePreference.not())
+                postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
+            else if (pref.shouldShowIntroduce)
+                postSideEffect(AreaVerificationSideEffect.NavigateToIntroduce)
+            else
+                postSideEffect(AreaVerificationSideEffect.NavigateToSpotList)
+        }.onFailure {
+            postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
+        }
     }
 
     @AssistedFactory
@@ -57,4 +69,6 @@ sealed interface AreaVerificationSideEffect {
     data class ShowErrorToast(val errorMessage: String) : AreaVerificationSideEffect
 
     data object NavigateToChooseDislikes : AreaVerificationSideEffect
+    data object NavigateToIntroduce : AreaVerificationSideEffect
+    data object NavigateToSpotList : AreaVerificationSideEffect
 }
