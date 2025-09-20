@@ -11,13 +11,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.acon.acon.core.model.model.spot.SpotNavigationParameter
 import com.acon.acon.core.model.model.spot.Spot
 import com.acon.acon.core.model.type.TransportMode
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.feature.spot.screen.spotlist.SpotListSideEffectV2
 import com.acon.acon.feature.spot.screen.spotlist.SpotListViewModel
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.feature.spot.screen.spotlist.SpotListUiStateV2
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
@@ -38,7 +38,7 @@ fun SpotListScreenContainer(
     val deepLinkHandler = LocalDeepLinkHandler.current
     val context = LocalContext.current
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val onSignInRequired = LocalRequestSignIn.current
 
     LaunchedEffect(Unit) {
@@ -64,7 +64,7 @@ fun SpotListScreenContainer(
             state = state,
             onSpotTypeChanged = viewModel::onSpotTypeClicked,
             onSpotClick = { spot, rank ->
-                if (userType == UserType.GUEST)
+                if (userType == SignInStatus.GUEST)
                     onSignInRequired("click_detail_guest?")
                 else
                     viewModel.onSpotClicked(spot, rank)
@@ -89,7 +89,7 @@ fun SpotListScreenContainer(
     }
 
     viewModel.requestLocationPermission()
-    viewModel.useUserType()
+    viewModel.useSignInStatus()
     viewModel.useLiveLocation()
     viewModel.collectSideEffect {
         when (it) {

@@ -5,92 +5,64 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.acon.acon.core.designsystem.effect.screenDefault
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.core.navigation.route.SettingsRoute
-import com.acon.acon.core.navigation.route.ProfileRoute
-import com.acon.acon.feature.profile.composable.screen.bookmark.composable.BookmarkScreenContainer
-import com.acon.acon.feature.profile.composable.screen.profile.composable.ProfileScreenContainer
-import com.acon.acon.feature.profile.composable.screen.profileMod.composable.ProfileModScreenContainer
 import com.acon.acon.core.model.model.spot.SpotNavigationParameter
+import com.acon.acon.core.navigation.route.ProfileRoute
+import com.acon.acon.core.navigation.route.SettingsRoute
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.route.UploadRoute
+import com.acon.acon.feature.profile.composable.screen.bookmark.composable.BookmarkScreenContainer
+import com.acon.feature.profile.info.composable.ProfileInfoScreenContainer
+import com.acon.feature.profile.update.composable.ProfileUpdateScreenContainer
 
 internal fun NavGraphBuilder.profileNavigation(
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState
 ) {
     navigation<ProfileRoute.Graph>(
-        startDestination = ProfileRoute.Profile,
+        startDestination = ProfileRoute.ProfileInfo,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None }
     ) {
-        composable<ProfileRoute.Profile> {
-            ProfileScreenContainer(
-                snackbarHostState = snackbarHostState,
+        composable<ProfileRoute.ProfileInfo> {
+            ProfileInfoScreenContainer(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(AconTheme.color.Gray900)
+                    .screenDefault()
                     .statusBarsPadding(),
-                onNavigateToSpotDetailScreen = {
-                    navController.navigate(
-                        SpotRoute.SpotDetail(
-                            com.acon.acon.core.model.model.spot.SpotNavigationParameter(
-                                it,
-                                emptyList(),
-                                null,
-                                null,
-                                null,
-                                true
-                            )
-                        )
-                    )
+                onNavigateToProfileUpdate = {
+                    navController.navigate(ProfileRoute.ProfileUpdate)
                 },
-                onNavigateToBookMarkScreen = {
+                onNavigateToSpotDetail = {
+                    navController.navigate(SpotRoute.SpotDetail(it))
+                },
+                onNavigateToSavedSpots = {
                     navController.navigate(ProfileRoute.Bookmark)
                 },
-                onNavigateToSpotListScreen = {
+                onNavigateToSetting = {
+                    navController.navigate(SettingsRoute.Settings)
+                },
+                onNavigateToSpotList = {
                     navController.popBackStack(
                         route = SpotRoute.SpotList,
                         inclusive = false
                     )
                 },
-                onNavigateToSettingsScreen = { navController.navigate(SettingsRoute.Settings) },
-                onNavigateToProfileEditScreen = {
-                    navController.navigate(
-                        ProfileRoute.ProfileMod(
-                            null
-                        )
-                    )
-                },
-                onNavigateToUploadScreen = {
+                onNavigateToUpload = {
                     navController.navigate(UploadRoute.Graph)
                 }
             )
         }
 
-        composable<ProfileRoute.ProfileMod> { backStackEntry ->
-            val savedStateHandle = backStackEntry.savedStateHandle
-            val selectedPhotoId by savedStateHandle
-                .getStateFlow<String?>("selectedPhotoId", null)
-                .collectAsState()
-
-            ProfileModScreenContainer(
-                modifier = Modifier.fillMaxSize(),
-                selectedPhotoId = selectedPhotoId,
-                onNavigateToBack = {
-                    navController.popBackStack()
-                },
-                onClickComplete = {
-                    navController.popBackStack()
-                },
+        composable<ProfileRoute.ProfileUpdate> { backStackEntry ->
+            ProfileUpdateScreenContainer(
+                onNavigateBack = navController::navigateUp,
+                modifier = Modifier.screenDefault().systemBarsPadding()
             )
         }
 
@@ -103,7 +75,7 @@ internal fun NavGraphBuilder.profileNavigation(
                 onNavigateToSpotDetailScreen = {
                     navController.navigate(
                         SpotRoute.SpotDetail(
-                            com.acon.acon.core.model.model.spot.SpotNavigationParameter(
+                            SpotNavigationParameter(
                                 it,
                                 emptyList(),
                                 null,

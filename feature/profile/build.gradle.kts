@@ -1,3 +1,5 @@
+import utils.androidTestImplementation
+import utils.testImplementation
 import java.util.Properties
 
 plugins {
@@ -20,10 +22,28 @@ android {
     defaultConfig {
         buildConfigField("String", "BUCKET_URL", "\"${localProperties["BUCKET_URL"]}\"")
     }
+
+    packaging {
+        resources {
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
+    }
 }
 
 dependencies {
     implementation(libs.google.services.ads) // TODO - admob Plugin 분리?
     implementation(libs.androidx.paignig.compose)
 
+    testImplementation(libs.bundles.non.android.test)
+    androidTestImplementation(libs.bundles.non.android.test)
+    androidTestImplementation(libs.mockk.android)
+    testRuntimeOnly(libs.bundles.junit5.runtime)
+    androidTestImplementation(libs.bundles.android.test)
+    testImplementation(libs.bundles.orbit.test)
+    testImplementation(libs.bundles.kotest)
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

@@ -62,7 +62,7 @@ import com.acon.acon.core.analytics.constants.PropertyKeys
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.core.ui.compose.getTextSizeDp
 import dev.chrisbanes.haze.hazeSource
 import okhttp3.internal.immutableListOf
@@ -91,7 +91,7 @@ internal fun SpotDetailScreen(
         stringResource(R.string.no_store_image_mystery)
     )
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val deepLinkHandler = LocalDeepLinkHandler.current
     val onSignInRequired = LocalRequestSignIn.current
 
@@ -129,7 +129,7 @@ internal fun SpotDetailScreen(
                 if (state.isAreaVerified) {
                     deepLinkHandler.clear()
                     onNavigateToBack()
-                } else if (deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.UserType.USER) {
+                } else if (deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.SignInStatus.USER) {
                     deepLinkHandler.clear()
                     onBackToAreaVerification()
                 } else {
@@ -258,7 +258,7 @@ internal fun SpotDetailScreen(
                                     if (state.isAreaVerified) {
                                         deepLinkHandler.clear()
                                         onNavigateToBack()
-                                    } else if (deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.UserType.USER) {
+                                    } else if (deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.SignInStatus.USER) {
                                         deepLinkHandler.clear()
                                         onBackToAreaVerification()
                                     } else {
@@ -413,14 +413,14 @@ internal fun SpotDetailScreen(
                                 }
                             },
                             onClickBookmark = {
-                                if (userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                                if (userType == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                                     onSignInRequired("")
                                     deepLinkHandler.clear()
                                 } else {
                                     onClickBookmark()
                                 }
                             },
-                            isBookmarkSelected = if (userType == com.acon.acon.core.model.type.UserType.GUEST) false else state.spotDetail.isSaved,
+                            isBookmarkSelected = if (userType == com.acon.acon.core.model.type.SignInStatus.GUEST) false else state.spotDetail.isSaved,
                             isMenuBoardEnabled = state.spotDetail.hasMenuboardImage
                         )
                     }

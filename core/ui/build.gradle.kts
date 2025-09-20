@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.acon.android.library)
     alias(libs.plugins.acon.android.library.compose)
     alias(libs.plugins.acon.android.library.haze)
+    alias(libs.plugins.acon.android.library.hilt)
     alias(libs.plugins.acon.android.library.coil)
     alias(libs.plugins.acon.android.library.orbit)
 }
@@ -15,4 +16,5 @@ dependencies {
     api(projects.core.model)
 
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.ui.test)
 }

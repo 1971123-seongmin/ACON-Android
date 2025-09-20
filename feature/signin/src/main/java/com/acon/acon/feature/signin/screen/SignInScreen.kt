@@ -22,7 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -40,23 +39,20 @@ import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.component.button.AconGoogleSignInButton
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.feature.signin.screen.component.SignInTopBar
-import com.acon.acon.feature.signin.utils.SplashAudioManager
-import com.acon.acon.core.analytics.amplitude.AconAmplitude
-import com.acon.acon.core.analytics.constants.EventNames
-import com.acon.acon.core.analytics.constants.PropertyKeys
-import com.acon.acon.core.model.model.user.VerificationStatus
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.core.ui.compose.getScreenHeight
 import com.acon.acon.core.ui.compose.getScreenWidth
-import com.acon.acon.feature.signin.utils.rememberSocialRepository
+import com.acon.acon.core.ui.rememberActivityComponentEntryPoint
+import com.acon.acon.feature.signin.screen.component.SignInTopBar
+import com.acon.acon.feature.signin.utils.SplashAudioManager
+import com.acon.core.social.client.SocialAuthClient
+import com.acon.core.social.di.AuthClientEntryPoint
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
@@ -65,12 +61,12 @@ fun SignInScreen(
     navigateToSpotListView: () -> Unit,
     onClickTermsOfUse: () -> Unit,
     onClickPrivacyPolicy: () -> Unit,
-    onSignInComplete: (VerificationStatus) -> Unit,
+    onSignInButtonClick: (SocialAuthClient) -> Unit,
     onAnimationEnd:() -> Unit,
     onSkipButtonClick: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val socialRepository = rememberSocialRepository()
+
+    val authClientEntryPoint = rememberActivityComponentEntryPoint<AuthClientEntryPoint>()
 
     val context = LocalContext.current
     val activity = context as? Activity
@@ -85,14 +81,14 @@ fun SignInScreen(
     )
     val logoAnimationState = animateLottieCompositionAsState(composition = composition)
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val deepLinkHandler = LocalDeepLinkHandler.current
 
     LaunchedEffect(Unit) {
         snapshotFlow { logoAnimationState.value }
             .collect { animationValue ->
                 if (animationValue == 1f) {
-                    if(deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                    if(deepLinkHandler.hasDeepLink.value && userType == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                         navigateToSpotListView()
                     } else {
                         onAnimationEnd()
@@ -179,13 +175,7 @@ fun SignInScreen(
                                 .alpha(alpha),
                             onClick = {
                                 if (alpha >= 0.75f) {
-                                    scope.launch {
-                                        socialRepository.googleSignIn()
-                                            .onSuccess {
-                                                onSignInComplete(it)
-                                            }.onFailure {
-                                            }
-                                    }
+                                    onSignInButtonClick(authClientEntryPoint.googleAuthClient())
                                 }
                             }
                         )
@@ -257,7 +247,7 @@ private fun PreviewSignInScreen() {
             onClickPrivacyPolicy = {},
             onAnimationEnd = {},
             onSkipButtonClick = {},
-            onSignInComplete = {}
+            onSignInButtonClick = {}
         )
     }
 }

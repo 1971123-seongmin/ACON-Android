@@ -44,14 +44,14 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.ui)
     implementation(projects.core.launcher)
+    implementation(projects.core.data)
+    implementation(projects.core.social)
 
     implementation(projects.domain)
-    implementation(projects.data)
 
     implementation(projects.feature.signin)
     implementation(projects.feature.spot)
     implementation(projects.feature.onboarding)
-    implementation(projects.feature.areaverification)
     implementation(projects.feature.upload)
     implementation(projects.feature.settings)
     implementation(projects.feature.profile)

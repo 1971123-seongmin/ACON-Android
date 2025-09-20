@@ -5,7 +5,6 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.acon.acon.domain.repository.UserRepository
-import com.acon.acon.core.model.type.UserType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,8 +22,8 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.getUserType().collectLatest {
-                _state.value = state.value.copy(userType = it)
+            userRepository.getSignInStatus().collectLatest {
+                _state.value = state.value.copy(signInStatus = it)
             }
         }
     }
@@ -57,7 +56,7 @@ class MainViewModel @Inject constructor(
 @Immutable
 data class AconAppState(
     val snackbarHostState: SnackbarHostState = SnackbarHostState(),
-    val userType: com.acon.acon.core.model.type.UserType = com.acon.acon.core.model.type.UserType.GUEST,
+    val signInStatus: com.acon.acon.core.model.type.SignInStatus = com.acon.acon.core.model.type.SignInStatus.GUEST,
     val showSignInBottomSheet: Boolean = false,
     val showPermissionDialog: Boolean = false,
     val propertyKey: String = "",
