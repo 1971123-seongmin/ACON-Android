@@ -115,7 +115,7 @@ private fun StoreDetailButton(
 ) {
     var isLongPressed by remember { mutableStateOf(false) }
     var lastClickTime by remember { mutableLongStateOf(0L) }
-    val throttleTime = 1000L
+    val throttleTime = 3000L
 
     val density = LocalDensity.current
     val blurPx = with(density) { 4.dp.toPx() }
