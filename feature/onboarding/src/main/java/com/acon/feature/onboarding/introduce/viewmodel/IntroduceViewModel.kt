@@ -14,7 +14,9 @@ class IntroduceViewModel @Inject constructor(
 
     override val container = container<IntroduceState, IntroduceSideEffect>(
         initialState = IntroduceState()
-    )
+    ) {
+        onboardingRepository.updateShouldShowIntroduce(false)
+    }
 
     fun onIntroduceLocalReviewScreenDisposed() = intent {
         reduce {
@@ -41,7 +43,6 @@ class IntroduceViewModel @Inject constructor(
     }
 
     fun onStartButtonClicked() = intent {
-        onboardingRepository.updateShouldShowIntroduce(false)
         postSideEffect(IntroduceSideEffect.OnNavigateToHomeScreen)
     }
 }
