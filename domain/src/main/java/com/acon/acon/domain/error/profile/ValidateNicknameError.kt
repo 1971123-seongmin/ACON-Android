@@ -1,17 +1,16 @@
 package com.acon.acon.domain.error.profile
 
 import com.acon.acon.domain.error.RootError
-import com.acon.acon.domain.error.UNSPECIFIED_SERVER_ERROR_CODE
 
 open class ValidateNicknameError : RootError() {
 
     class EmptyInput : ValidateNicknameError()
     class InputLengthExceeded : ValidateNicknameError()
     class InvalidFormat : ValidateNicknameError() {
-        override val code: Int = UNSPECIFIED_SERVER_ERROR_CODE
+        override val code: Int = 40051
     }
     class AlreadyExist : ValidateNicknameError() {
-        override val code: Int = UNSPECIFIED_SERVER_ERROR_CODE
+        override val code: Int = 40901
     }
 
     final override fun createErrorInstances(): Array<RootError> {

@@ -15,7 +15,7 @@ class ValidateNicknameUseCase @Inject constructor(
     suspend operator fun invoke(nickname: String) : Result<Unit> {
         return when {
             nickname.isEmpty() -> Result.failure(ValidateNicknameError.EmptyInput())
-            nickname.length > 14 -> Result.failure(ValidateNicknameError.InputLengthExceeded())
+            nickname.length > MAX_NICKNAME_LENGTH -> Result.failure(ValidateNicknameError.InputLengthExceeded())
             nickname.containsInvalidCharacters() -> Result.failure(ValidateNicknameError.InvalidFormat())
             else -> profileRepository.validateNickname(nickname)
         }
@@ -23,5 +23,9 @@ class ValidateNicknameUseCase @Inject constructor(
 
     private fun String.containsInvalidCharacters(): Boolean {
         return nicknameValidationRegex.containsMatchIn(this)
+    }
+
+    companion object {
+        const val MAX_NICKNAME_LENGTH = 14
     }
 }

@@ -2,8 +2,9 @@ package com.acon.acon.domain.usecase
 
 import com.acon.acon.domain.error.profile.ValidateBirthDateError
 import java.time.LocalDate
+import javax.inject.Inject
 
-class ValidateBirthDateUseCase() {
+class ValidateBirthDateUseCase @Inject constructor() {
 
     private val pastThreshold = LocalDate.of(1900, 1, 1)
 

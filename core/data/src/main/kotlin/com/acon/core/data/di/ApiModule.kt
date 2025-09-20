@@ -14,6 +14,7 @@ import com.acon.core.data.api.remote.auth.SpotAuthApi
 import com.acon.core.data.api.remote.noauth.SpotNoAuthApi
 import com.acon.core.data.api.remote.auth.UploadAuthApi
 import com.acon.core.data.api.remote.auth.UserAuthApi
+import com.acon.core.data.api.remote.noauth.FileUploadApi
 import com.acon.core.data.api.remote.noauth.UserNoAuthApi
 import dagger.Module
 import dagger.Provides
@@ -112,5 +113,13 @@ internal object ApiModule {
         @NoAuth retrofit: Retrofit
     ): AconAppNoAuthApi {
         return retrofit.create(AconAppNoAuthApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesFileUploadApi(
+        @NoAuth retrofit: Retrofit
+    ): FileUploadApi {
+        return retrofit.create(FileUploadApi::class.java)
     }
 }
