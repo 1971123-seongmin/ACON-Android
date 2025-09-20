@@ -22,6 +22,13 @@ android {
     defaultConfig {
         buildConfigField("String", "BUCKET_URL", "\"${localProperties["BUCKET_URL"]}\"")
     }
+
+    packaging {
+        resources {
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
+    }
 }
 
 dependencies {

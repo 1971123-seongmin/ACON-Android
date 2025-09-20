@@ -5,44 +5,44 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.acon.acon.core.designsystem.effect.screenDefault
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.core.navigation.route.ProfileRouteLegacy
+import com.acon.acon.core.model.model.spot.SpotNavigationParameter
+import com.acon.acon.core.navigation.route.ProfileRoute
 import com.acon.acon.core.navigation.route.SettingsRoute
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.route.UploadRoute
 import com.acon.acon.feature.profile.composable.screen.bookmark.composable.BookmarkScreenContainer
-import com.acon.acon.feature.profile.composable.screen.profileMod.composable.ProfileModScreenContainerLegacy
 import com.acon.feature.profile.info.composable.ProfileInfoScreenContainer
+import com.acon.feature.profile.update.composable.ProfileUpdateScreenContainer
 
-internal fun NavGraphBuilder.profileNavigationLegacy(
+internal fun NavGraphBuilder.profileNavigation(
     navController: NavHostController,
 ) {
-    navigation<ProfileRouteLegacy.Graph>(
-        startDestination = ProfileRouteLegacy.ProfileLegacy,
+    navigation<ProfileRoute.Graph>(
+        startDestination = ProfileRoute.ProfileInfo,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None }
     ) {
-        composable<ProfileRouteLegacy.ProfileLegacy> {
+        composable<ProfileRoute.ProfileInfo> {
             ProfileInfoScreenContainer(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(AconTheme.color.Gray900)
+                    .screenDefault()
                     .statusBarsPadding(),
                 onNavigateToProfileUpdate = {
-                    navController
+                    navController.navigate(ProfileRoute.ProfileUpdate)
                 },
                 onNavigateToSpotDetail = {
                     navController.navigate(SpotRoute.SpotDetail(it))
                 },
                 onNavigateToSavedSpots = {
-
+                    navController.navigate(ProfileRoute.Bookmark)
                 },
                 onNavigateToSetting = {
                     navController.navigate(SettingsRoute.Settings)
@@ -59,25 +59,14 @@ internal fun NavGraphBuilder.profileNavigationLegacy(
             )
         }
 
-        composable<ProfileRouteLegacy.ProfileModLegacy> { backStackEntry ->
-            val savedStateHandle = backStackEntry.savedStateHandle
-            val selectedPhotoId by savedStateHandle
-                .getStateFlow<String?>("selectedPhotoId", null)
-                .collectAsState()
-
-            ProfileModScreenContainerLegacy(
-                modifier = Modifier.fillMaxSize(),
-                selectedPhotoId = selectedPhotoId,
-                onNavigateToBack = {
-                    navController.popBackStack()
-                },
-                onClickComplete = {
-                    navController.popBackStack()
-                },
+        composable<ProfileRoute.ProfileUpdate> { backStackEntry ->
+            ProfileUpdateScreenContainer(
+                onNavigateBack = navController::navigateUp,
+                modifier = Modifier.screenDefault().systemBarsPadding()
             )
         }
 
-        composable<ProfileRouteLegacy.Bookmark> {
+        composable<ProfileRoute.Bookmark> {
             BookmarkScreenContainer(
                 modifier = Modifier.fillMaxSize(),
                 onNavigateToBack = {
@@ -86,7 +75,7 @@ internal fun NavGraphBuilder.profileNavigationLegacy(
                 onNavigateToSpotDetailScreen = {
                     navController.navigate(
                         SpotRoute.SpotDetail(
-                            com.acon.acon.core.model.model.spot.SpotNavigationParameter(
+                            SpotNavigationParameter(
                                 it,
                                 emptyList(),
                                 null,

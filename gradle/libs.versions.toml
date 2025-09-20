@@ -144,6 +144,7 @@ kotest-property = { group = "io.kotest", name = "kotest-property", version.ref =
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitAndroid" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "junitComposeVersion" }
+androidx-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
 
 # Paging
 androidx-paignig-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-compose" }
