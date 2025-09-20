@@ -16,6 +16,7 @@ class IntroduceViewModel @Inject constructor(
         initialState = IntroduceState()
     ) {
         onboardingRepository.updateShouldShowIntroduce(false)
+        onboardingRepository.updateHasTastePreference(true)
     }
 
     fun onIntroduceLocalReviewScreenDisposed() = intent {
