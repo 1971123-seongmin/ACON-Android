@@ -58,16 +58,16 @@ import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
 import com.acon.acon.core.ui.compose.LocalLocation
 import com.acon.acon.core.ui.compose.LocalRequestLocationPermission
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalSnackbarHostState
 import com.acon.acon.core.ui.compose.LocalSignInStatus
+import com.acon.acon.core.ui.compose.LocalSnackbarHostState
 import com.acon.acon.domain.repository.AconAppRepository
+import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.navigation.AconNavigation
 import com.acon.acon.provider.ads_impl.SpotListAdProvider
 import com.acon.acon.update.AppUpdateHandler
 import com.acon.acon.update.AppUpdateHandlerImpl
 import com.acon.acon.update.UpdateState
-import com.acon.core.social.client.GoogleAuthClient
 import com.acon.core.social.di.AuthClientEntryPoint
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
@@ -124,7 +124,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private val appUpdateManager by lazy {
-        AppUpdateManagerFactory.create(application)
+        try {
+            AppUpdateManagerFactory.create(application)
+        } catch (e: Exception) {
+            null
+        }
     }
     private val appUpdateActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
@@ -152,14 +156,14 @@ class MainActivity : ComponentActivity() {
                         )
                         when (result) {
                             SnackbarResult.ActionPerformed -> {
-                                appUpdateManager.completeUpdate()
+                                appUpdateManager?.completeUpdate()
                             }
 
                             SnackbarResult.Dismissed -> Unit
                         }
                     }
                 } else if (state.installStatus() == InstallStatus.INSTALLED) {
-                    appUpdateManager.unregisterListener(this)
+                    appUpdateManager?.unregisterListener(this)
                 }
             }
         }
@@ -167,7 +171,7 @@ class MainActivity : ComponentActivity() {
 
     private val appUpdateHandler: AppUpdateHandler by lazy {
         AppUpdateHandlerImpl(
-            appUpdateManager = appUpdateManager.apply {
+            appUpdateManager = appUpdateManager?.apply {
                 registerListener(appInstallStateListener)
             },
             aconAppRepository = aconAppRepository,
@@ -478,9 +482,9 @@ class MainActivity : ComponentActivity() {
         }
 
         DisposableEffect(appUpdateManager) {
-            appUpdateManager.registerListener(appInstallStateListener)
+            appUpdateManager?.registerListener(appInstallStateListener)
             onDispose {
-                appUpdateManager.unregisterListener(appInstallStateListener)
+                appUpdateManager?.unregisterListener(appInstallStateListener)
             }
         }
     }

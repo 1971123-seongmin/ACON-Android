@@ -35,7 +35,7 @@ interface AppUpdateHandler {
 }
 
 class AppUpdateHandlerImpl(
-    private val appUpdateManager: AppUpdateManager,
+    private val appUpdateManager: AppUpdateManager?,
     private val aconAppRepository: AconAppRepository,
     private val appUpdateActivityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
     private val application: Application,
@@ -43,7 +43,9 @@ class AppUpdateHandlerImpl(
 ) : AppUpdateHandler {
 
     private val appUpdateInfo = flow {
-        emit(appUpdateManager.appUpdateInfo.await())
+        appUpdateManager?.appUpdateInfo?.let {
+            emit(it.await())
+        }
     }.stateIn(
         scope = scope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -80,7 +82,7 @@ class AppUpdateHandlerImpl(
     }
 
     override fun startFlexibleUpdate() {
-        appUpdateManager.startUpdateFlowForResult(
+        appUpdateManager?.startUpdateFlowForResult(
             appUpdateInfo.value ?: return,
             appUpdateActivityResultLauncher,
             AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE)
