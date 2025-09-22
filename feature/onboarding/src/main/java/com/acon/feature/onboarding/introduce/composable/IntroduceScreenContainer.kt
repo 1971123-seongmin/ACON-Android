@@ -16,6 +16,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun IntroduceScreenContainer(
     onNavigateToHome: () -> Unit,
+    onNavigateToAreaVerification: () -> Unit,
+    onNavigateToChooseDislikes: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: IntroduceViewModel = hiltViewModel()
 ) {
@@ -49,7 +51,9 @@ fun IntroduceScreenContainer(
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            IntroduceSideEffect.OnNavigateToHomeScreen -> onNavigateToHome()
+            IntroduceSideEffect.NavigateToHomeScreen -> onNavigateToHome()
+            IntroduceSideEffect.NavigateToAreaVerification -> onNavigateToAreaVerification()
+            IntroduceSideEffect.NavigateToChooseDislikes -> onNavigateToChooseDislikes()
         }
     }
 }

@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OnboardingPreferences(
     val shouldShowIntroduce: Boolean,
-    val hasTastePreference: Boolean,
-    val hasVerifiedArea: Boolean
+    val shouldChooseDislikes: Boolean,
+    val shouldVerifyArea: Boolean
 )

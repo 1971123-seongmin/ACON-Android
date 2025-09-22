@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.acon.acon.core.designsystem.effect.screenDefault
 import com.acon.acon.core.navigation.LocalNavController
+import com.acon.acon.core.navigation.route.AreaVerificationRoute
 import com.acon.acon.core.navigation.route.OnboardingRoute
 import com.acon.acon.core.navigation.route.SettingsRoute
 import com.acon.acon.core.navigation.route.SpotRoute
@@ -51,6 +52,12 @@ internal fun NavGraphBuilder.onboardingNavigation(
                 modifier = Modifier.screenDefault().statusBarsPadding(),
                 onNavigateToHome = {
                     navController.navigateAndClear(SpotRoute.Graph)
+                },
+                onNavigateToAreaVerification = {
+                    navController.navigateAndClear(AreaVerificationRoute.Graph)
+                },
+                onNavigateToChooseDislikes = {
+                    navController.navigateAndClear(OnboardingRoute.ChooseDislikes)
                 }
             )
         }

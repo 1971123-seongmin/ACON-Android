@@ -33,14 +33,12 @@ class AreaVerificationViewModel @AssistedInject constructor(
         timeRepository.saveUserActionTime(UserActionType.SKIP_AREA_VERIFICATION, System.currentTimeMillis())
 
         onboardingRepository.getOnboardingPreferences().onSuccess { pref ->
-            if (pref.hasTastePreference.not())
+            if (pref.shouldChooseDislikes)
                 postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
-            else if (pref.shouldShowIntroduce)
-                postSideEffect(AreaVerificationSideEffect.NavigateToIntroduce)
             else
                 postSideEffect(AreaVerificationSideEffect.NavigateToSpotList)
         }.onFailure {
-            postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
+            postSideEffect(AreaVerificationSideEffect.NavigateToSpotList)
         }
     }
 

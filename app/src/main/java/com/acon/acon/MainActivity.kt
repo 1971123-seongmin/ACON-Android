@@ -50,6 +50,7 @@ import com.acon.acon.core.designsystem.effect.rememberHazeState
 import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.core.navigation.LocalNavController
 import com.acon.acon.core.navigation.route.AreaVerificationRoute
+import com.acon.acon.core.navigation.route.OnboardingRoute
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.utils.navigateAndClear
 import com.acon.acon.core.ui.activityComponentEntryPoint
@@ -104,6 +105,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var userRepository: UserRepository
+
+    @Inject
+    lateinit var onboardingRepository: OnboardingRepository
 
     @Inject
     lateinit var aconAppRepository: AconAppRepository
@@ -350,25 +354,28 @@ class MainActivity : ComponentActivity() {
                                     val code = client.getCredentialCode() ?: return@launch
 
                                     userRepository.signIn(client.platform, code)
-                                        .onSuccess { verificationStatus ->
-                                            if (verificationStatus.hasVerifiedArea) {
-                                                navController.navigate(SpotRoute.SpotList) {
-                                                    popUpTo(navController.graph.id) {
-                                                        inclusive = true
-                                                    }
-                                                }
-                                            } else {
-                                                navController.navigateAndClear(
-                                                    AreaVerificationRoute.AreaVerification
-                                                )
-                                            }
+                                        .onSuccess { externalUUID ->
                                             if (appState.propertyKey.isNotBlank()) {
                                                 AconAmplitude.trackEvent(
                                                     eventName = EventNames.GUEST,
                                                     property = appState.propertyKey to true
                                                 )
                                             }
-                                            AconAmplitude.setUserId(verificationStatus.externalUUID)
+                                            AconAmplitude.setUserId(externalUUID.value)
+
+                                            onboardingRepository.getOnboardingPreferences().onSuccess { pref ->
+                                                if (pref.shouldShowIntroduce) {
+                                                    navController.navigateAndClear(OnboardingRoute.Introduce)
+                                                } else if (pref.shouldVerifyArea) {
+                                                    navController.navigateAndClear(AreaVerificationRoute.AreaVerification)
+                                                } else if (pref.shouldChooseDislikes) {
+                                                    navController.navigateAndClear(OnboardingRoute.ChooseDislikes)
+                                                } else {
+                                                    navController.navigateAndClear(SpotRoute.SpotList)
+                                                }
+                                            }.onFailure {
+                                                navController.navigateAndClear(SpotRoute.SpotList)
+                                            }
                                         }.onFailure { e ->
                                             Timber.e(e)
                                         }

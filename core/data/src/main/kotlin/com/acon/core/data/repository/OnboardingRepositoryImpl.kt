@@ -25,7 +25,7 @@ class OnboardingRepositoryImpl @Inject constructor(
         return runCatchingWith(PostTastePreferenceResultError()) {
             val request = TastePreferenceRequest(dislikeFoods = dislikeFoods.map { it.name })
             onboardingRemoteDataSource.submitTastePreferenceResult(request)
-            onboardingLocalDataSource.updateHasPreference(true)
+            onboardingLocalDataSource.updateShouldChooseDislikes(false)
         }
     }
 
@@ -37,13 +37,13 @@ class OnboardingRepositoryImpl @Inject constructor(
             latitude = latitude,
             longitude = longitude
         )
-        onboardingLocalDataSource.updateHasVerifiedArea(true)
+        onboardingLocalDataSource.updateShouldVerifyArea(false)
         areaDataStream.notifyDataChanged()
     }
 
-    override suspend fun updateHasTastePreference(hasPreference: Boolean): Result<Unit> {
+    override suspend fun updateShouldChooseDislikes(shouldChoose: Boolean): Result<Unit> {
         return runCatchingWith {
-            onboardingLocalDataSource.updateHasPreference(hasPreference)
+            onboardingLocalDataSource.updateShouldChooseDislikes(shouldChoose)
         }
     }
 
@@ -53,9 +53,9 @@ class OnboardingRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateHasVerifiedArea(hasVerifiedArea: Boolean): Result<Unit> {
+    override suspend fun updateShouldVerifyArea(shouldVerify: Boolean): Result<Unit> {
         return runCatchingWith {
-            onboardingLocalDataSource.updateHasVerifiedArea(hasVerifiedArea)
+            onboardingLocalDataSource.updateShouldVerifyArea(shouldVerify)
         }
     }
 
@@ -64,8 +64,8 @@ class OnboardingRepositoryImpl @Inject constructor(
             val entity = onboardingLocalDataSource.getOnboardingPreferences()
             OnboardingPreferences(
                 shouldShowIntroduce = entity.shouldShowIntroduce,
-                hasTastePreference = entity.hasTastePreference,
-                hasVerifiedArea = entity.hasVerifiedArea
+                shouldChooseDislikes = entity.shouldChooseDislikes,
+                shouldVerifyArea = entity.shouldVerifyArea
             )
         }
     }

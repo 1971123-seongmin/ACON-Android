@@ -13,9 +13,9 @@ interface OnboardingRepository {
         longitude: Double
     ): Result<Unit>
 
-    suspend fun updateHasTastePreference(hasPreference: Boolean): Result<Unit>
     suspend fun updateShouldShowIntroduce(shouldShow: Boolean): Result<Unit>
-    suspend fun updateHasVerifiedArea(hasVerifiedArea: Boolean): Result<Unit>
+    suspend fun updateShouldChooseDislikes(shouldChoose: Boolean): Result<Unit>
+    suspend fun updateShouldVerifyArea(shouldVerify: Boolean): Result<Unit>
 
     suspend fun getOnboardingPreferences(): Result<OnboardingPreferences>
 }

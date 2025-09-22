@@ -77,7 +77,7 @@ class SpotListViewModel @Inject constructor(
                     var showAreaVerificationModal = false
                     if (isCooldownExpiredUseCase(UserActionType.SKIP_AREA_VERIFICATION, 24 * 60 * 60) && signInStatus.value != SignInStatus.GUEST) {
                         showAreaVerificationModal = onboardingRepository.getOnboardingPreferences()
-                            .getOrNull()?.hasVerifiedArea == false
+                            .getOrNull()?.shouldVerifyArea == true
                     }
                     fetchSpotList(location,
                         Condition(

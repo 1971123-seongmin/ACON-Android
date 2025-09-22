@@ -2,7 +2,7 @@ package com.acon.core.data.repository
 
 import com.acon.acon.core.model.model.user.CredentialCode
 import com.acon.acon.core.model.model.user.SocialPlatform
-import com.acon.acon.core.model.model.user.VerificationStatus
+import com.acon.acon.core.model.model.user.ExternalUUID
 import com.acon.acon.data.dto.request.DeleteAccountRequest
 import com.acon.acon.domain.error.user.PostSignInError
 import com.acon.acon.domain.error.user.PostSignOutError
@@ -33,7 +33,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun signIn(
         socialType: SocialPlatform,
         code: CredentialCode
-    ): Result<VerificationStatus> {
+    ): Result<ExternalUUID> {
         return runCatchingWith(PostSignInError()) {
             val signInResponse = userRemoteDataSource.signIn(
                 SignInRequest(
@@ -49,16 +49,16 @@ class UserRepositoryImpl @Inject constructor(
 
             coroutineScope {
                 val verifiedAreaJob = async {
-                    onboardingRepository.updateHasVerifiedArea(signInResponse.toVerificationStatus().hasVerifiedArea)
+                    onboardingRepository.updateShouldVerifyArea(!signInResponse.hasVerifiedArea)
                 }
                 val tastePreferenceJob = async {
-                    onboardingRepository.updateHasTastePreference(signInResponse.toVerificationStatus().hasPreference)
+                    onboardingRepository.updateShouldChooseDislikes(!signInResponse.hasPreference)
                 }
 
                 awaitAll(verifiedAreaJob, tastePreferenceJob)
             }
 
-            signInResponse.toVerificationStatus()
+            ExternalUUID(signInResponse.externalUUID)
         }
     }
 
@@ -70,8 +70,8 @@ class UserRepositoryImpl @Inject constructor(
             )
         }.onSuccess {
             profileLocalDataSource.clearCache()
-            onboardingRepository.updateHasVerifiedArea(false)
-            onboardingRepository.updateHasTastePreference(false)
+            onboardingRepository.updateShouldVerifyArea(true)
+            onboardingRepository.updateShouldChooseDislikes(true)
             clearSession()
         }
     }
@@ -86,8 +86,8 @@ class UserRepositoryImpl @Inject constructor(
                 )
             )
         }.onSuccess {
-            onboardingRepository.updateHasVerifiedArea(false)
-            onboardingRepository.updateHasTastePreference(false)
+            onboardingRepository.updateShouldVerifyArea(true)
+            onboardingRepository.updateShouldChooseDislikes(true)
             clearSession()
         }
     }
