@@ -8,6 +8,7 @@ import com.acon.core.data.api.remote.noauth.AconAppNoAuthApi
 import com.acon.core.data.api.remote.MapApi
 import com.acon.core.data.api.remote.MapSearchApi
 import com.acon.core.data.api.remote.ProfileApi
+import com.acon.core.data.api.remote.auth.AconAppApi
 import com.acon.core.data.api.remote.auth.OnboardingAuthApi
 import com.acon.core.data.api.remote.auth.SpotAuthApi
 import com.acon.core.data.api.remote.noauth.SpotNoAuthApi
@@ -100,10 +101,18 @@ internal object ApiModule {
 
     @Singleton
     @Provides
-    fun providesAconAppApi(
+    fun providesAconAppNoAuthApi(
         @NoAuth retrofit: Retrofit
     ): AconAppNoAuthApi {
         return retrofit.create(AconAppNoAuthApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesAconAppApi(
+        @Auth retrofit: Retrofit
+    ): AconAppApi {
+        return retrofit.create(AconAppApi::class.java)
     }
 
     @Singleton
