@@ -139,3 +139,5 @@
 -dontwarn androidx.**
 -keep class androidx.** { *; }
 -keep interface androidx.** { *; }
+
+-keep class com.acon.core.data.dto.entity.OnboardingPreferencesEntity { *; }
