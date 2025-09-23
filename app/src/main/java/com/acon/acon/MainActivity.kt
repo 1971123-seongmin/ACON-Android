@@ -128,12 +128,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private val appUpdateManager by lazy {
-        try {
+        if (!BuildConfig.IS_QA_BUILD)
             AppUpdateManagerFactory.create(application)
-        } catch (e: Exception) {
-            null
-        }
+        else null
     }
+
     private val appUpdateActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             when (result.resultCode) {

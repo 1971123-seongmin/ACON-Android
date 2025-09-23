@@ -58,7 +58,7 @@ class AppUpdateHandlerImpl(
                 val packageInfo =
                     application.packageManager.getPackageInfo(application.packageName, 0)
                 packageInfo.versionName
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 null
             }
             if (currentAppVersion == null)
