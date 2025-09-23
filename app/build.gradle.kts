@@ -1,5 +1,3 @@
-import utils.androidTestImplementation
-
 /** See AndroidApplicationConventionPlugin.kt */
 
 plugins {
@@ -9,6 +7,7 @@ plugins {
     alias(libs.plugins.acon.android.library.haze)
     alias(libs.plugins.acon.android.library.naver.map)
     alias(libs.plugins.acon.firebase)
+    alias(libs.plugins.acon.common.unit.test)
 }
 
 android {
@@ -84,12 +83,4 @@ dependencies {
     implementation(libs.startup)
 
     implementation(libs.androidx.core.splashscreen)
-
-    testImplementation(libs.bundles.non.android.test)
-    testRuntimeOnly(libs.bundles.junit5.runtime)
-    androidTestImplementation(libs.bundles.android.test)
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }

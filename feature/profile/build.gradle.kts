@@ -1,5 +1,3 @@
-import utils.androidTestImplementation
-import utils.testImplementation
 import java.util.Properties
 
 plugins {
@@ -10,6 +8,7 @@ plugins {
     alias(libs.plugins.acon.android.library.orbit)
     alias(libs.plugins.acon.android.library.haze)
     alias(libs.plugins.acon.android.library.coil)
+    alias(libs.plugins.acon.feature.test)
 }
 
 val localProperties = Properties().apply {
@@ -34,14 +33,6 @@ android {
 dependencies {
     implementation(libs.google.services.ads) // TODO - admob Plugin 분리?
     implementation(libs.androidx.paignig.compose)
-
-    testImplementation(libs.bundles.non.android.test)
-    androidTestImplementation(libs.bundles.non.android.test)
-    androidTestImplementation(libs.mockk.android)
-    testRuntimeOnly(libs.bundles.junit5.runtime)
-    androidTestImplementation(libs.bundles.android.test)
-    testImplementation(libs.bundles.orbit.test)
-    testImplementation(libs.bundles.kotest)
 }
 
 tasks.withType<Test> {

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.acon.android.library.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.acon.common.unit.test)
 }
 
 val localProperties = Properties().apply {
@@ -76,10 +77,6 @@ dependencies {
     implementation(libs.preferences.datastore)
     implementation(libs.proto.datastore)
     implementation(libs.protobuf.kotlin)
-
-    testImplementation(libs.bundles.non.android.test)
-    testRuntimeOnly(libs.bundles.junit5.runtime)
-    androidTestImplementation(libs.bundles.android.test)
 }
 
 tasks.withType<Test> {

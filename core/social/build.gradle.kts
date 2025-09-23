@@ -4,6 +4,7 @@ import kotlin.apply
 plugins {
     alias(libs.plugins.acon.android.library)
     alias(libs.plugins.acon.android.library.hilt)
+    alias(libs.plugins.acon.common.unit.test)
 }
 
 val localProperties = Properties().apply {
@@ -23,9 +24,6 @@ dependencies {
     implementation(projects.core.model)
 
     implementation(libs.bundles.googleSignIn)
-
-    testImplementation(libs.bundles.non.android.test)
-    testRuntimeOnly(libs.bundles.junit5.runtime)
 }
 
 tasks.withType<Test> {
