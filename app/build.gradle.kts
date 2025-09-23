@@ -14,6 +14,18 @@ plugins {
 android {
     namespace = "com.acon.acon"
 
+    flavorDimensions += "distributionChannel"
+    productFlavors {
+        create("qa") {
+            dimension = "distributionChannel"
+            buildConfigField("boolean", "IS_QA_BUILD", "true")
+        }
+        create("production") {
+            dimension = "distributionChannel"
+            buildConfigField("boolean", "IS_QA_BUILD", "false")
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -31,6 +43,14 @@ android {
             signingConfig = signingConfigs.getByName("release")
             manifestPlaceholders["app_name"] = "Acon"
             manifestPlaceholders["app_domain"] = "aconpage"
+        }
+    }
+}
+
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        if (variant.name == "productionDebug") {
+            variant.enable = false
         }
     }
 }
