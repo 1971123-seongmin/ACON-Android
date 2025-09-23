@@ -13,24 +13,23 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
-import com.acon.acon.core.common.UrlConstants
 import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.core.ui.android.showToast
-import com.acon.acon.feature.spot.mock.spotListUiStateRestaurantMock
+import com.acon.acon.core.model.model.spot.Spot
+import com.acon.acon.core.model.type.SignInStatus
+import com.acon.acon.core.model.type.TransportMode
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.getScreenHeight
 import com.acon.acon.core.ui.compose.toDp
+import com.acon.acon.feature.spot.mock.spotListUiStateRestaurantMock
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -38,10 +37,11 @@ private const val MAX_GUEST_AVAILABLE_COUNT = 5
 
 @Composable
 internal fun SpotEmptyView(
-    signInStatus: com.acon.acon.core.model.type.SignInStatus,
-    otherSpots: ImmutableList<com.acon.acon.core.model.model.spot.Spot>,
-    onSpotClick: (com.acon.acon.core.model.model.spot.Spot, rank: Int) -> Unit,
-    onTryFindWay: (com.acon.acon.core.model.model.spot.Spot) -> Unit,
+    signInStatus: SignInStatus,
+    otherSpots: ImmutableList<Spot>,
+    onSpotClick: (Spot, rank: Int) -> Unit,
+    onTryFindWay: (Spot) -> Unit,
+    onRegisterNewSpotClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val screenHeightDp = getScreenHeight()
@@ -86,7 +86,7 @@ internal fun SpotEmptyView(
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(top = 60.dp, bottom = 24.dp)
                     )
-                if (index >= MAX_GUEST_AVAILABLE_COUNT && signInStatus == com.acon.acon.core.model.type.SignInStatus.GUEST) {
+                if (index >= MAX_GUEST_AVAILABLE_COUNT && signInStatus == SignInStatus.GUEST) {
                     SpotGuestItem(
                         spot = spot,
                         modifier = Modifier
@@ -98,7 +98,7 @@ internal fun SpotEmptyView(
                 } else {
                     SpotItem(
                         spot = spot,
-                        transportMode = com.acon.acon.core.model.type.TransportMode.BIKING,
+                        transportMode = TransportMode.BIKING,
                         onItemClick = { onSpotClick(spot, index + 1) },
                         onFindWayButtonClick = onTryFindWay,
                         modifier = Modifier
@@ -109,9 +109,6 @@ internal fun SpotEmptyView(
                 }
             }
         } else {
-            val uriHandler = LocalUriHandler.current
-            val context = LocalContext.current
-
             Text(
                 text = stringResource(R.string.no_other_spots),
                 style = AconTheme.typography.Title4,
@@ -126,11 +123,7 @@ internal fun SpotEmptyView(
                 color = AconTheme.color.Action,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.noRippleClickable {
-                    try {
-                        uriHandler.openUri(UrlConstants.REQUEST_NEW_SPOT)
-                    } catch (e: Exception) {
-                        context.showToast("웹사이트 접속에 실패했어요")
-                    }
+                    onRegisterNewSpotClick()
                 }
             )
         }
@@ -142,10 +135,11 @@ internal fun SpotEmptyView(
 @Composable
 private fun SpotListEmptyView1Preview() {
     SpotEmptyView(
-        signInStatus = com.acon.acon.core.model.type.SignInStatus.GUEST,
+        signInStatus = SignInStatus.GUEST,
         otherSpots = spotListUiStateRestaurantMock.spotList.toImmutableList(),
         onSpotClick = { _, _ -> },
         onTryFindWay = {},
+        onRegisterNewSpotClick = {},
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -154,10 +148,11 @@ private fun SpotListEmptyView1Preview() {
 @Composable
 private fun SpotListEmptyView2Preview() {
     SpotEmptyView(
-        signInStatus = com.acon.acon.core.model.type.SignInStatus.GUEST,
-        otherSpots = listOf<com.acon.acon.core.model.model.spot.Spot>().toImmutableList(),
+        signInStatus = SignInStatus.GUEST,
+        otherSpots = listOf<Spot>().toImmutableList(),
         onSpotClick = { _, _ -> },
         onTryFindWay = {},
+        onRegisterNewSpotClick = {},
         modifier = Modifier.fillMaxSize()
     )
 }

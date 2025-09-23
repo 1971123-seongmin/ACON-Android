@@ -57,6 +57,9 @@ internal fun NavGraphBuilder.spotNavigation(
                 onNavigateToAreaVerificationScreen = { lat, lon ->
                     navController.navigate(AreaVerificationRoute.VerifyInMap)
                 },
+                onNavigateToUploadPlace = {
+                    navController.navigate(UploadRoute.Place)
+                },
                 modifier = Modifier
                     .fillMaxSize()
                     .background(AconTheme.color.Gray900)

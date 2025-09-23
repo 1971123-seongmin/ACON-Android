@@ -32,6 +32,7 @@ fun SpotListScreenContainer(
     onNavigateToAreaVerificationScreen: (latitude: Double, longitude: Double) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToDeeplinkSpotDetailScreen: (spotNav: SpotNavigationParameter) -> Unit = {},
+    onNavigateToUploadPlace: () -> Unit = {},
     viewModel: SpotListViewModel = hiltViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -84,6 +85,13 @@ fun SpotListScreenContainer(
                 val lat = (state as? SpotListUiStateV2.Success)?.currentLocation?.latitude ?: 0.0
                 val lon = (state as? SpotListUiStateV2.Success)?.currentLocation?.longitude ?: 0.0
                 onNavigateToAreaVerificationScreen(lat, lon)
+            },
+            onRegisterNewSpotClick = {
+                println("$userType")
+                if (userType == SignInStatus.GUEST)
+                    onSignInRequired("")
+                else
+                    viewModel.onRegisterNewSpot()
             }
         )
     }
@@ -103,6 +111,10 @@ fun SpotListScreenContainer(
 
             is SpotListSideEffectV2.NavigateToExternalMap -> {
                 it.handler.startNavigationApp(context)
+            }
+
+            is SpotListSideEffectV2.NavigateToUploadPlace -> {
+                onNavigateToUploadPlace()
             }
         }
     }
