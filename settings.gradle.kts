@@ -21,11 +21,11 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Acon"
+rootProject.name = "ACON-Android"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 includeBuild("build-logic")
 
-include(":app")
+include(":acon")
 
 include(
     ":core:designsystem",
