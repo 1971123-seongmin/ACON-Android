@@ -35,7 +35,8 @@ fun NavGraphBuilder.areaVerificationNavigation(
                 skippable = LocalNavController.current.hasPreviousBackStackEntry().not(),
                 onNavigateToChooseDislikes = { navController.navigateAndClear(OnboardingRoute.ChooseDislikes) },
                 onNavigateToIntroduce = { navController.navigateAndClear(OnboardingRoute.Introduce) },
-                onNavigateToSpotList = { navController.navigateAndClear(SpotRoute.SpotList) }
+                onNavigateToSpotList = { navController.navigateAndClear(SpotRoute.SpotList) },
+                onNavigateBack = navController::navigateUp
             )
         }
 

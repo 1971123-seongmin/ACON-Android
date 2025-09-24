@@ -42,6 +42,10 @@ class AreaVerificationViewModel @AssistedInject constructor(
         }
     }
 
+    fun onBackClicked() = intent {
+        postSideEffect(AreaVerificationSideEffect.NavigateBack)
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(shouldShowSkipButton: Boolean): AreaVerificationViewModel
@@ -69,4 +73,5 @@ sealed interface AreaVerificationSideEffect {
     data object NavigateToChooseDislikes : AreaVerificationSideEffect
     data object NavigateToIntroduce : AreaVerificationSideEffect
     data object NavigateToSpotList : AreaVerificationSideEffect
+    data object NavigateBack : AreaVerificationSideEffect
 }
