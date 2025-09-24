@@ -2,6 +2,7 @@ package com.acon.acon.provider.ads_impl
 
 import android.annotation.SuppressLint
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -39,6 +40,7 @@ import com.acon.acon.core.designsystem.component.button.v2.AconFilledButton
 import com.acon.acon.core.designsystem.effect.imageGradientLayer
 import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.core.ads_api.AdProvider
+import com.acon.acon.core.designsystem.R
 import com.acon.feature.ads_impl.BuildConfig
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
@@ -63,6 +65,7 @@ class SpotListAdProvider : AdProvider {
 private fun SpotListNativeAd(modifier: Modifier) {
     val context = LocalContext.current
     var adUiState by remember { mutableStateOf<AdUiState>(AdUiState.Loading) }
+    val callToActionClickTrigger = remember { View(context) }
 
     DisposableEffect(Unit) {
         val adLoader = AdLoader.Builder(context, BuildConfig.NATIVE_ADMOB_ID)
@@ -122,6 +125,9 @@ private fun SpotListNativeAd(modifier: Modifier) {
                         }
                         layout.addView(adChoicesView, adChoicesLayoutParams)
 
+                        layout.addView(callToActionClickTrigger)
+                        nativeAdView.callToActionView = callToActionClickTrigger
+
                         nativeAdView.addView(layout)
                         nativeAdView.setNativeAd(ad)
                         nativeAdView
@@ -151,7 +157,7 @@ private fun SpotListNativeAd(modifier: Modifier) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(com.acon.acon.core.designsystem.R.string.advertisement),
+                            text = stringResource(R.string.advertisement),
                             style = AconTheme.typography.Body1,
                             color = AconTheme.color.White,
                             fontWeight = FontWeight.W400,
@@ -179,7 +185,7 @@ private fun SpotListNativeAd(modifier: Modifier) {
                         ad.callToAction?.let {
                             AconFilledButton(
                                 modifier = Modifier,
-                                onClick = {},
+                                onClick = callToActionClickTrigger::performClick,
                                 contentPadding = PaddingValues(
                                     horizontal = 23.dp,
                                     vertical = 8.dp
