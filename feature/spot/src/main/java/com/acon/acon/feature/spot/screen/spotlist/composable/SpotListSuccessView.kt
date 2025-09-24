@@ -41,20 +41,20 @@ import androidx.compose.ui.zIndex
 import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.component.bottomsheet.AconBottomSheet
 import com.acon.acon.core.designsystem.effect.LocalHazeState
-import com.acon.acon.core.designsystem.effect.effect.shadowLayerBackground
 import com.acon.acon.core.designsystem.effect.effect.getOverlayColor
+import com.acon.acon.core.designsystem.effect.effect.shadowLayerBackground
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.feature.spot.screen.spotlist.SpotListUiStateV2
-import com.acon.core.ads.LocalSpotListAdProvider
 import com.acon.acon.core.model.model.spot.Spot
 import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.model.type.TransportMode
-import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.toDp
 import com.acon.acon.core.ui.android.KakaoNavigationAppHandler
 import com.acon.acon.core.ui.android.NaverNavigationAppHandler
 import com.acon.acon.core.ui.android.NavigationAppHandler
+import com.acon.acon.core.ui.compose.LocalRequestSignIn
+import com.acon.acon.core.ui.compose.toDp
+import com.acon.acon.feature.spot.screen.spotlist.SpotListUiStateV2
+import com.acon.core.ads.SpotListNativeAd
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.absoluteValue
@@ -269,7 +269,7 @@ internal fun SpotListSuccessView(
                         )
                     }
                 } else {
-                    LocalSpotListAdProvider.current.NativeAd(
+                    SpotListNativeAd(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(20.dp))

@@ -35,8 +35,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.acon.core.ads.AdProvider
-import com.acon.core.ads.LocalSpotListAdProvider
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.common.DeepLinkHandler
@@ -65,7 +63,6 @@ import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.navigation.AconNavigation
-import com.acon.core.ads.SpotListAdProvider
 import com.acon.acon.update.AppUpdateHandler
 import com.acon.acon.update.AppUpdateHandlerImpl
 import com.acon.acon.update.UpdateState
@@ -116,7 +113,6 @@ class MainActivity : ComponentActivity() {
 
     private val deepLinkHandler = DeepLinkHandler()
 
-    private val spotListAdProvider: AdProvider = SpotListAdProvider()
     private val gpsResolutionResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
@@ -335,7 +331,6 @@ class MainActivity : ComponentActivity() {
                         viewModel.updateAmplPropertyKey(it)
                     },
                     LocalRequestLocationPermission provides ::requestLocationPermission,
-                    LocalSpotListAdProvider provides spotListAdProvider,
                     LocalDeepLinkHandler provides deepLinkHandler
                 ) {
                     AconNavigation(

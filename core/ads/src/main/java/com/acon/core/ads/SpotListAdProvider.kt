@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
+import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.component.button.v2.AconFilledButton
 import com.acon.acon.core.designsystem.effect.imageGradientLayer
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.core.designsystem.R
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -50,17 +50,9 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 
-class SpotListAdProvider : AdProvider {
-
-    @Composable
-    override fun NativeAd(modifier: Modifier) {
-        SpotListNativeAd(modifier)
-    }
-}
-
 @SuppressLint("MissingPermission")
 @Composable
-private fun SpotListNativeAd(modifier: Modifier) {
+fun SpotListNativeAd(modifier: Modifier) {
     val context = LocalContext.current
     var adUiState by remember { mutableStateOf<AdUiState>(AdUiState.Loading) }
     val callToActionClickTrigger = remember { View(context) }
