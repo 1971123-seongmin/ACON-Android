@@ -1,4 +1,5 @@
 import java.util.Properties
+import kotlin.apply
 
 plugins {
     alias(libs.plugins.acon.android.library)
@@ -12,7 +13,7 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.acon.feature.ads_impl"
+    namespace = "com.acon.core.ads"
 
     defaultConfig {
         buildConfigField("String", "NATIVE_ADMOB_ID", "\"${localProperties["native_admob_id"]}\"")
@@ -21,7 +22,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.adsApi)
     implementation(projects.core.designsystem)
 
     implementation(libs.google.services.ads)

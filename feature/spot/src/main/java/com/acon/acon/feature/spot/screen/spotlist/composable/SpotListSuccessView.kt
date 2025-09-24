@@ -46,7 +46,7 @@ import com.acon.acon.core.designsystem.effect.effect.getOverlayColor
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
 import com.acon.acon.feature.spot.screen.spotlist.SpotListUiStateV2
-import com.acon.acon.core.ads_api.LocalSpotListAdProvider
+import com.acon.core.ads.LocalSpotListAdProvider
 import com.acon.acon.core.model.model.spot.Spot
 import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.model.type.TransportMode

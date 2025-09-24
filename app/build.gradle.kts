@@ -58,7 +58,7 @@ dependencies {
 
     implementation(projects.core.designsystem)
     implementation(projects.core.map)
-    implementation(projects.core.adsApi)
+    implementation(projects.core.ads)
     implementation(projects.core.analytics)
     implementation(projects.core.navigation)
     implementation(projects.core.ui)
@@ -74,8 +74,6 @@ dependencies {
     implementation(projects.feature.upload)
     implementation(projects.feature.settings)
     implementation(projects.feature.profile)
-
-    implementation(projects.provider.adsImpl)
 
     implementation(libs.branch.io)
     implementation(libs.google.services.ads)

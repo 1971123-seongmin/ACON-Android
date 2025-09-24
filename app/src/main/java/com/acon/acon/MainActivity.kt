@@ -35,8 +35,8 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.acon.acon.core.ads_api.AdProvider
-import com.acon.acon.core.ads_api.LocalSpotListAdProvider
+import com.acon.core.ads.AdProvider
+import com.acon.core.ads.LocalSpotListAdProvider
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.common.DeepLinkHandler
@@ -65,7 +65,7 @@ import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.UserRepository
 import com.acon.acon.navigation.AconNavigation
-import com.acon.acon.provider.ads_impl.SpotListAdProvider
+import com.acon.core.ads.SpotListAdProvider
 import com.acon.acon.update.AppUpdateHandler
 import com.acon.acon.update.AppUpdateHandlerImpl
 import com.acon.acon.update.UpdateState
