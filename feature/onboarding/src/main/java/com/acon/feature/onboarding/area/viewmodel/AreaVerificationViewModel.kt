@@ -21,7 +21,9 @@ class AreaVerificationViewModel @AssistedInject constructor(
         AreaVerificationState(
             shouldShowSkipButton = shouldShowSkipButton
         )
-    )
+    ) {
+        onboardingRepository.updateShouldVerifyArea(false)
+    }
 
     fun onNextButtonClick() = intent {
         postSideEffect(
