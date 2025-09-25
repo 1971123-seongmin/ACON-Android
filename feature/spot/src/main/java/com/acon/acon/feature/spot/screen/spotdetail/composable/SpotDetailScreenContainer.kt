@@ -7,10 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.acon.acon.core.designsystem.R
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.core.map.onLocationReady
 import com.acon.acon.core.ui.android.showToast
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.android.openNaverMapNavigationWithMode
+import com.acon.acon.core.ui.compose.LocalRequestSignIn
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -23,6 +26,8 @@ fun SpotDetailScreenContainer(
 ) {
     val context = LocalContext.current
     val state by viewModel.collectAsState()
+    val signInStatus = LocalSignInStatus.current
+    val onRequestSignIn = LocalRequestSignIn.current
 
     CompositionLocalProvider(LocalOnRetry provides viewModel::retry) {
         SpotDetailScreen(
@@ -30,7 +35,13 @@ fun SpotDetailScreenContainer(
             modifier = modifier,
             onNavigateToBack = viewModel::navigateToBack,
             onBackToAreaVerification = onBackToAreaVerification,
-            onClickBookmark = viewModel::toggleBookmark,
+            onClickBookmark = {
+                if (signInStatus == SignInStatus.GUEST) {
+                    onRequestSignIn("")
+                } else {
+                    viewModel.toggleBookmark()
+                }
+            },
             onClickRequestMenuBoard = viewModel::fetchMenuBoardList,
             onDismissMenuBoard = viewModel::onDismissMenuBoard,
             onRequestErrorReportModal = viewModel::onRequestReportErrorModal,
