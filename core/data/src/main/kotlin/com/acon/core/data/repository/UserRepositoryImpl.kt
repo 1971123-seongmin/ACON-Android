@@ -48,14 +48,21 @@ class UserRepositoryImpl @Inject constructor(
             )
 
             coroutineScope {
-                val verifiedAreaJob = async {
+                val shouldVerifyAreaJob = async {
                     onboardingRepository.updateShouldVerifyArea(!signInResponse.hasVerifiedArea)
                 }
-                val tastePreferenceJob = async {
+                val shouldChooseDislikesJob = async {
                     onboardingRepository.updateShouldChooseDislikes(!signInResponse.hasPreference)
                 }
 
-                awaitAll(verifiedAreaJob, tastePreferenceJob)
+                val shouldShowIntroduceJob = async {
+                    onboardingRepository.updateShouldShowIntroduce(
+                        (onboardingRepository.getOnboardingPreferences().getOrNull()?.shouldShowIntroduce == true)
+                                && !signInResponse.hasVerifiedArea
+                                && !signInResponse.hasPreference
+                    )
+                }
+                awaitAll(shouldVerifyAreaJob, shouldChooseDislikesJob, shouldShowIntroduceJob)
             }
 
             ExternalUUID(signInResponse.externalUUID)
