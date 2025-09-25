@@ -45,21 +45,7 @@ class SpotDetailViewModel @Inject constructor(
 
     override val container =
         container<SpotDetailUiState, SpotDetailSideEffect>(SpotDetailUiState.Loading) {
-            signInStatus.collect {
-                when (it) {
-                    SignInStatus.GUEST -> {
-                        if (spotNavData.isFromDeepLink == true) {
-                            fetchedSpotDetail()
-                        } else {
-                            reduce { SpotDetailUiState.LoadFailed() }
-                        }
-                    }
-
-                    else -> {
-                        fetchedSpotDetail()
-                    }
-                }
-            }
+            fetchedSpotDetail()
         }
 
     private fun fetchedSpotDetail() = intent {
@@ -70,14 +56,14 @@ class SpotDetailViewModel @Inject constructor(
         val isDeepLink = spotNavData.isFromDeepLink == true
 
         val spotDetailDeferred = viewModelScope.async {
-            if (isDeepLink) {
+            if (signInStatus.value == SignInStatus.GUEST) {
                 spotRepository.fetchSpotDetail(
                     spotId = spotNavData.spotId,
-                    isDeepLink = true
+                    isDeepLink = isDeepLink
                 )
             } else {
                 spotRepository.fetchSpotDetailFromUser(
-                    spotId = spotNavData.spotId
+                    spotId = spotNavData.spotId,
                 )
             }
         }

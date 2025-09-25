@@ -64,12 +64,7 @@ fun SpotListScreenContainer(
         SpotListScreen(
             state = state,
             onSpotTypeChanged = viewModel::onSpotTypeClicked,
-            onSpotClick = { spot, rank ->
-                if (userType == SignInStatus.GUEST)
-                    onSignInRequired("click_detail_guest?")
-                else
-                    viewModel.onSpotClicked(spot, rank)
-            },
+            onSpotClick = viewModel::onSpotClicked,
             onTryFindWay = viewModel::onTryFindWay,
             onNavigationAppChoose = viewModel::onNavigationAppChosen,
             onChooseNavigationAppModalDismiss = viewModel::onChooseNavigationAppModalDismissed,
@@ -87,7 +82,6 @@ fun SpotListScreenContainer(
                 onNavigateToAreaVerificationScreen(lat, lon)
             },
             onRegisterNewSpotClick = {
-                println("$userType")
                 if (userType == SignInStatus.GUEST)
                     onSignInRequired("")
                 else
