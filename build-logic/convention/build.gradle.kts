@@ -61,5 +61,13 @@ gradlePlugin {
             id = "com.acon.firebase"
             implementationClass = "FirebaseConventionPlugin"
         }
+        register("featureTest") {
+            id = "com.acon.feature.test"
+            implementationClass = "test.FeatureTestConventionPlugin"
+        }
+        register("commonUnitTest") {
+            id = "com.acon.common.unit.test"
+            implementationClass = "test.CommonUnitTestConventionPlugin"
+        }
     }
 }

@@ -13,8 +13,8 @@ class OnboardingPreferencesSerializer @Inject constructor() : Serializer<Onboard
 
     override val defaultValue: OnboardingPreferencesEntity = OnboardingPreferencesEntity.getDefaultInstance().copy {
         shouldShowIntroduce = true
-        hasTastePreference = false
-        hasVerifiedArea = false
+        shouldChooseDislikes = true
+        shouldVerifyArea = true
     }
 
     override suspend fun readFrom(input: InputStream): OnboardingPreferencesEntity {

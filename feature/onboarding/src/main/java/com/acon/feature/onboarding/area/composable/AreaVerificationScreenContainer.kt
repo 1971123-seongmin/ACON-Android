@@ -24,6 +24,7 @@ fun AreaVerificationScreenContainer(
     onNavigateToChooseDislikes: () -> Unit,
     onNavigateToIntroduce: () -> Unit,
     onNavigateToSpotList: () -> Unit,
+    onNavigateBack: () -> Unit,
     skippable: Boolean,
     modifier: Modifier = Modifier,
     viewModel: AreaVerificationViewModel = hiltViewModel(creationCallback = { factory: AreaVerificationViewModel.Factory ->
@@ -46,7 +47,8 @@ fun AreaVerificationScreenContainer(
             }
         },
         modifier = modifier,
-        onSkipClick = viewModel::onSkipClicked
+        onSkipClick = viewModel::onSkipClicked,
+        onBack = viewModel::onBackClicked
     )
 
     viewModel.useLiveLocation()
@@ -77,6 +79,7 @@ fun AreaVerificationScreenContainer(
             is AreaVerificationSideEffect.NavigateToChooseDislikes -> onNavigateToChooseDislikes()
             is AreaVerificationSideEffect.NavigateToIntroduce -> onNavigateToIntroduce()
             is AreaVerificationSideEffect.NavigateToSpotList -> onNavigateToSpotList()
+            is AreaVerificationSideEffect.NavigateBack -> onNavigateBack()
         }
     }
 

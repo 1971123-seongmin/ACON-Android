@@ -7,6 +7,7 @@ import com.acon.acon.core.model.model.profile.SavedSpot
 import com.acon.acon.core.model.model.profile.SpotThumbnailStatus
 import com.acon.acon.domain.error.profile.UpdateProfileError
 import com.acon.acon.domain.error.profile.ValidateNicknameError
+import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.core.data.assertValidErrorMapping
 import com.acon.core.data.createErrorStream
@@ -47,7 +48,7 @@ class ProfileRepositoryTest {
     private lateinit var profileLocalDataSource: ProfileLocalDataSource
 
     @MockK
-    private lateinit var aconAppRemoteDataSource: AconAppRemoteDataSource
+    private lateinit var aconAppRepository: AconAppRepository
 
     @MockK
     private lateinit var dataStream: DataStream
@@ -63,7 +64,7 @@ class ProfileRepositoryTest {
     @BeforeEach
     fun setUp() {
         profileRepository = ProfileRepositoryImpl(
-            profileRemoteDataSource, profileLocalDataSource, aconAppRemoteDataSource, dataStream,
+            profileRemoteDataSource, profileLocalDataSource, aconAppRepository, dataStream,
             mockk(relaxed = true)
         )
     }

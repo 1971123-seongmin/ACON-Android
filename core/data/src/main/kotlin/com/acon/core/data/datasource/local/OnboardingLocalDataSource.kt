@@ -14,8 +14,8 @@ class OnboardingLocalDataSource @Inject constructor(
         onboardingDataStore.updateData { prefs ->
             prefs.copy {
                 shouldShowIntroduce = pref.shouldShowIntroduce
-                hasTastePreference = pref.hasTastePreference
-                hasVerifiedArea = pref.hasVerifiedArea
+                shouldChooseDislikes = pref.shouldChooseDislikes
+                shouldVerifyArea = pref.shouldVerifyArea
             }
         }
     }
@@ -28,18 +28,18 @@ class OnboardingLocalDataSource @Inject constructor(
         }
     }
 
-    suspend fun updateHasPreference(hasPreference: Boolean) {
+    suspend fun updateShouldChooseDislikes(shouldChooseDislikes: Boolean) {
         onboardingDataStore.updateData { prefs ->
             prefs.copy {
-                this.hasTastePreference = hasPreference
+                this.shouldChooseDislikes = shouldChooseDislikes
             }
         }
     }
 
-    suspend fun updateHasVerifiedArea(verifiedArea: Boolean) {
+    suspend fun updateShouldVerifyArea(shouldVerifyArea: Boolean) {
         onboardingDataStore.updateData { prefs ->
             prefs.copy {
-                this.hasVerifiedArea = verifiedArea
+                this.shouldVerifyArea = shouldVerifyArea
             }
         }
     }

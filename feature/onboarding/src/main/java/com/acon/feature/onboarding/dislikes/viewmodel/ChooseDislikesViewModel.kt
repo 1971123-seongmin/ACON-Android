@@ -18,7 +18,7 @@ class ChooseDislikesViewModel @Inject constructor(
 ) : BaseContainerHost<ChooseDislikesUiState, ChooseDislikesSideEffect>() {
 
     override val container = container<ChooseDislikesUiState, ChooseDislikesSideEffect>(ChooseDislikesUiState.Success()) {
-
+        onboardingRepository.updateShouldChooseDislikes(false)
     }
 
     fun onNoneClicked() = intent {

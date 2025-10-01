@@ -32,6 +32,7 @@ fun SpotListScreenContainer(
     onNavigateToAreaVerificationScreen: (latitude: Double, longitude: Double) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToDeeplinkSpotDetailScreen: (spotNav: SpotNavigationParameter) -> Unit = {},
+    onNavigateToUploadPlace: () -> Unit = {},
     viewModel: SpotListViewModel = hiltViewModel()
 ) {
     val state by viewModel.collectAsState()
@@ -63,12 +64,7 @@ fun SpotListScreenContainer(
         SpotListScreen(
             state = state,
             onSpotTypeChanged = viewModel::onSpotTypeClicked,
-            onSpotClick = { spot, rank ->
-                if (userType == SignInStatus.GUEST)
-                    onSignInRequired("click_detail_guest?")
-                else
-                    viewModel.onSpotClicked(spot, rank)
-            },
+            onSpotClick = viewModel::onSpotClicked,
             onTryFindWay = viewModel::onTryFindWay,
             onNavigationAppChoose = viewModel::onNavigationAppChosen,
             onChooseNavigationAppModalDismiss = viewModel::onChooseNavigationAppModalDismissed,
@@ -84,6 +80,12 @@ fun SpotListScreenContainer(
                 val lat = (state as? SpotListUiStateV2.Success)?.currentLocation?.latitude ?: 0.0
                 val lon = (state as? SpotListUiStateV2.Success)?.currentLocation?.longitude ?: 0.0
                 onNavigateToAreaVerificationScreen(lat, lon)
+            },
+            onRegisterNewSpotClick = {
+                if (userType == SignInStatus.GUEST)
+                    onSignInRequired("")
+                else
+                    viewModel.onRegisterNewSpot()
             }
         )
     }
@@ -103,6 +105,10 @@ fun SpotListScreenContainer(
 
             is SpotListSideEffectV2.NavigateToExternalMap -> {
                 it.handler.startNavigationApp(context)
+            }
+
+            is SpotListSideEffectV2.NavigateToUploadPlace -> {
+                onNavigateToUploadPlace()
             }
         }
     }

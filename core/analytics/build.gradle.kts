@@ -19,7 +19,4 @@ android {
 
 dependencies {
     implementation(libs.amplitude)
-
-    testImplementation(libs.bundles.android.test)
-    testImplementation(libs.bundles.non.android.test)
 }

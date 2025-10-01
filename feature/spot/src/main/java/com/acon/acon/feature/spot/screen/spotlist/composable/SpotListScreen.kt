@@ -74,7 +74,8 @@ internal fun SpotListScreen(
     onNavigateToUploadScreen: () -> Unit = {},
     onNavigateToProfileScreen: () -> Unit = {},
     onDismissAreaVerificationModalRequest: () -> Unit = {},
-    onNavigateToAreaVerificationScreen: () -> Unit = {}
+    onNavigateToAreaVerificationScreen: () -> Unit = {},
+    onRegisterNewSpotClick: () -> Unit = {}
 ) {
     val screenHeightDp = getScreenHeight()
     val screenHeightPx = with(LocalDensity.current) {
@@ -196,7 +197,8 @@ internal fun SpotListScreen(
                                     itemHeightPx = itemHeightPx,
                                     modifier = Modifier.fillMaxSize(),
                                     onNavigationAppChoose = onNavigationAppChoose,
-                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss
+                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss,
+                                    onRegisterNewSpotClick = onRegisterNewSpotClick
                                 )
                             }
 
@@ -227,7 +229,8 @@ internal fun SpotListScreen(
                                     itemHeightPx = itemHeightPx,
                                     modifier = Modifier.fillMaxSize(),
                                     onNavigationAppChoose = onNavigationAppChoose,
-                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss
+                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss,
+                                    onRegisterNewSpotClick = onRegisterNewSpotClick
                                 )
                             }
                         }

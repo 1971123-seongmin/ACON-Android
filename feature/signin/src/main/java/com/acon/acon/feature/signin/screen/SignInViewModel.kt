@@ -3,7 +3,7 @@ package com.acon.acon.feature.signin.screen
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.analytics.constants.PropertyKeys
-import com.acon.acon.core.model.model.user.VerificationStatus
+import com.acon.acon.core.model.model.user.ExternalUUID
 import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.repository.OnboardingRepository
@@ -31,14 +31,15 @@ class SignInViewModel @Inject constructor(
             }
         } else {
             onboardingRepository.getOnboardingPreferences().onSuccess {
-                if(it.hasTastePreference.not())
+                if (it.shouldShowIntroduce)
+                    postSideEffect(SignInSideEffect.NavigateToIntroduce)
+                else if (it.shouldVerifyArea)
+                    postSideEffect(SignInSideEffect.NavigateToAreaVerification)
+                else if (it.shouldChooseDislikes)
                     postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
-                else {
-                    if (it.shouldShowIntroduce)
-                        postSideEffect(SignInSideEffect.NavigateToIntroduce)
-                    else
-                        postSideEffect(SignInSideEffect.NavigateToSpotListView)
-                }
+                else
+                    postSideEffect(SignInSideEffect.NavigateToSpotListView)
+
             }
         }
         signInStatus.collectLatest {
@@ -62,30 +63,34 @@ class SignInViewModel @Inject constructor(
         val platform = socialAuthClient.platform
         val code = socialAuthClient.getCredentialCode()
 
-        userRepository.signIn(platform, code ?: return@intent).onSuccess { verificationStatus ->
-            onSignInComplete(verificationStatus)
+        userRepository.signIn(platform, code ?: return@intent).onSuccess { externalUUID ->
+            onSignInComplete(externalUUID)
         }.onFailure {
             postSideEffect(SignInSideEffect.ShowToastMessage)
         }
     }
 
-    private fun onSignInComplete(verificationStatus: VerificationStatus) = intent {
+    private fun onSignInComplete(externalUUID: ExternalUUID) = intent {
         AconAmplitude.trackEvent(
             eventName = EventNames.SIGN_IN,
             properties = mapOf(
                 PropertyKeys.SIGN_IN_OR_NOT to true
             )
         )
-        if (verificationStatus.hasVerifiedArea.not()) {
-            postSideEffect(SignInSideEffect.NavigateToAreaVerification)
-        } else if (verificationStatus.hasPreference.not()) {
-            postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
-        } else if (onboardingRepository.getOnboardingPreferences().getOrNull()?.shouldShowIntroduce == true) {
-            postSideEffect(SignInSideEffect.NavigateToIntroduce)
-        } else {
+        onboardingRepository.getOnboardingPreferences().onSuccess { pref ->
+            if (pref.shouldShowIntroduce) {
+                postSideEffect(SignInSideEffect.NavigateToIntroduce)
+            } else if (pref.shouldVerifyArea) {
+                postSideEffect(SignInSideEffect.NavigateToAreaVerification)
+            } else if (pref.shouldChooseDislikes) {
+                postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
+            } else {
+                postSideEffect(SignInSideEffect.NavigateToSpotListView)
+            }
+        }.onFailure {
             postSideEffect(SignInSideEffect.NavigateToSpotListView)
         }
-        AconAmplitude.setUserId(verificationStatus.externalUUID)
+        AconAmplitude.setUserId(externalUUID.value)
     }
 
     fun onClickTermsOfUse() = intent {

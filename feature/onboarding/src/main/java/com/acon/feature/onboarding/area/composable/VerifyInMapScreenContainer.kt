@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.acon.acon.core.model.model.OnboardingPreferences
 import com.acon.feature.onboarding.area.viewmodel.VerifyInMapSideEffect
 import com.acon.feature.onboarding.area.viewmodel.VerifyInMapViewModel
 import org.orbitmvi.orbit.compose.collectAsState

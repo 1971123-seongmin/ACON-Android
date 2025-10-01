@@ -257,6 +257,8 @@ acon-android-library-haze = { id = "com.acon.android.library.haze", version = "u
 acon-android-library-coil = { id = "com.acon.android.library.coil", version = "unspecified" }
 acon-android-library-naver-map = { id = "com.acon.android.library.naver.map", version = "unspecified" }
 acon-firebase = { id = "com.acon.firebase", version = "unspecified" }
+acon-feature-test = { id = "com.acon.feature.test", version = "unspecified"}
+acon-common-unit-test = { id = "com.acon.common.unit.test", version = "unspecified"}
 
 [bundles]
 googleSignIn = ["androidx-credentials", "androidx-credentials-play-services-auth", "googleid"]
@@ -270,8 +272,10 @@ coil = ["coil-compose", "coil-network-okhttp"]
 naver-map = ["naver-map-compose", "naver-map-location", "naver-map-sdk"]
 firebase = ["firebase-analytics-sdk", "firebase-crashlytics-sdk"]
 play-app-update = ["play-core", "play-core-ktx"]
-non-android-test = ["junit4", "kotlin-test", "mockk", "coroutine-test", "turbine", "junit5-api", "junit5-params"]
-junit5-runtime = ["junit5-runtime-engine", "junit5-runtime-vintage-engine"]
+
 android-test = ["androidx-junit", "androidx-espresso-core", "androidx-ui-test-junit4"]
 orbit-test = ["orbit-test"]
 kotest = ["kotest-runner", "kotest-property", "kotest-assertions"]
+test-coroutine = ["coroutine-test", "turbine"]
+test-unit = ["junit4", "kotlin-test", "junit5-api", "junit5-params"]
+test-runtime = ["junit5-runtime-engine", "junit5-runtime-vintage-engine"]

@@ -9,12 +9,13 @@ import com.acon.acon.core.model.model.upload.Feature
 import com.acon.acon.core.model.model.upload.SearchedSpotByMap
 import com.acon.acon.core.model.type.CafeFeatureType
 import com.acon.acon.core.model.type.CategoryType
+import com.acon.acon.core.model.type.ImageType
 import com.acon.acon.core.model.type.PriceFeatureType
 import com.acon.acon.core.model.type.RestaurantFeatureType
 import com.acon.acon.core.model.type.SpotType
+import com.acon.acon.domain.repository.AconAppRepository
 import com.acon.acon.domain.repository.MapSearchRepository
 import com.acon.acon.domain.repository.UploadRepository
-import com.acon.acon.feature.upload.BuildConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -26,23 +27,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.ConnectionPool
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.toImmutableList
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
-import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class UploadPlaceViewModel @Inject constructor(
     private val mapSearchRepository: MapSearchRepository,
+    private val aconAppRepository: AconAppRepository,
     private val uploadRepository: UploadRepository,
     application: Application
 ) : AndroidViewModel(application), ContainerHost<UploadPlaceUiState, UploadPlaceSideEffect> {
@@ -373,9 +367,9 @@ class UploadPlaceViewModel @Inject constructor(
 
         val presignedResults = runCatching {
             coroutineScope {
-                (0 until uris.size).map {
+                uris.map { uri ->
                     async(Dispatchers.IO) {
-                        uploadRepository.getUploadPlacePreSignedUrl().getOrThrow()
+                        aconAppRepository.uploadImage(ImageType.SPOT, uri.toString()).getOrThrow()
                     }
                 }.awaitAll()
             }
@@ -384,82 +378,11 @@ class UploadPlaceViewModel @Inject constructor(
             return@intent
         }.getOrThrow()
 
-        val uploadSuccessful = runCatching {
-            coroutineScope {
-                uris.zip(presignedResults).map { (imageUri, presignedResult) ->
-                    async(Dispatchers.IO) {
-                        putPlaceImageToPreSignedUrlOptimized(imageUri, presignedResult.preSignedUrl)
-                    }
-                }.awaitAll().all { it }
-            }
-        }.onFailure {
-            postSideEffect(UploadPlaceSideEffect.ShowToastUploadImageFailed)
-            return@intent
-        }.getOrThrow()
-
-        if (!uploadSuccessful) {
-            postSideEffect(UploadPlaceSideEffect.ShowToastUploadImageFailed)
-            return@intent
-        }
-
-        val bucketUrls = presignedResults.map { "${BuildConfig.BUCKET_URL}${it.fileName}" }
+        val bucketUrls = presignedResults.map { it }
         submitUploadPlace(onSuccess = onSuccess, imageList = bucketUrls)
     }
 
-    private suspend fun putPlaceImageToPreSignedUrlOptimized(
-        imageUri: Uri,
-        preSignedUrl: String
-    ): Boolean = withContext(Dispatchers.IO) {
-        val context = getApplication<Application>().applicationContext
-
-        return@withContext try {
-            val byteArray: ByteArray
-            val mimeType: String
-
-            if (imageUri.scheme == "content") {
-                context.contentResolver.openInputStream(imageUri).use { inputStream ->
-                    byteArray = inputStream?.readBytes()
-                        ?: throw IllegalArgumentException("이미지 읽기 실패")
-                }
-                mimeType = context.contentResolver.getType(imageUri) ?: "image/jpeg"
-            } else {
-                Timber.tag(TAG).e("지원하지 않는 URI scheme: %s", imageUri.toString())
-                throw IllegalArgumentException("지원하지 않는 URI scheme")
-            }
-
-            val fileBody = byteArray.toRequestBody(mimeType.toMediaTypeOrNull(), 0, byteArray.size)
-            val request = Request.Builder()
-                .url(preSignedUrl)
-                .put(fileBody)
-                .addHeader("Content-Type", mimeType)
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    Timber.tag(TAG).d("이미지 업로드 성공")
-                    true
-                } else {
-                    Timber.tag(TAG).e("이미지 업로드 실패, code: ${response.code}")
-                    false
-                }
-            }
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "이미지 업로드 과정에서 예외 발생: ${e.message}")
-            false
-        }
-    }
-
     companion object {
-        private val client: OkHttpClient by lazy {
-            OkHttpClient.Builder()
-                .connectionPool(ConnectionPool(20, 5, TimeUnit.MINUTES))
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(true)
-                .build()
-        }
-
         const val TAG = "UploadPlaceViewModel"
     }
 }

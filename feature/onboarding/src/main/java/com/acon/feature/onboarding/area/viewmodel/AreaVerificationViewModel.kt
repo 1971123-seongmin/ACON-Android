@@ -21,7 +21,9 @@ class AreaVerificationViewModel @AssistedInject constructor(
         AreaVerificationState(
             shouldShowSkipButton = shouldShowSkipButton
         )
-    )
+    ) {
+        onboardingRepository.updateShouldVerifyArea(false)
+    }
 
     fun onNextButtonClick() = intent {
         postSideEffect(
@@ -33,15 +35,17 @@ class AreaVerificationViewModel @AssistedInject constructor(
         timeRepository.saveUserActionTime(UserActionType.SKIP_AREA_VERIFICATION, System.currentTimeMillis())
 
         onboardingRepository.getOnboardingPreferences().onSuccess { pref ->
-            if (pref.hasTastePreference.not())
+            if (pref.shouldChooseDislikes)
                 postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
-            else if (pref.shouldShowIntroduce)
-                postSideEffect(AreaVerificationSideEffect.NavigateToIntroduce)
             else
                 postSideEffect(AreaVerificationSideEffect.NavigateToSpotList)
         }.onFailure {
-            postSideEffect(AreaVerificationSideEffect.NavigateToChooseDislikes)
+            postSideEffect(AreaVerificationSideEffect.NavigateToSpotList)
         }
+    }
+
+    fun onBackClicked() = intent {
+        postSideEffect(AreaVerificationSideEffect.NavigateBack)
     }
 
     @AssistedFactory
@@ -71,4 +75,5 @@ sealed interface AreaVerificationSideEffect {
     data object NavigateToChooseDislikes : AreaVerificationSideEffect
     data object NavigateToIntroduce : AreaVerificationSideEffect
     data object NavigateToSpotList : AreaVerificationSideEffect
+    data object NavigateBack : AreaVerificationSideEffect
 }

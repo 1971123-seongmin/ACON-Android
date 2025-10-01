@@ -16,16 +16,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +46,8 @@ internal fun AreaVerificationScreen(
     state: AreaVerificationState,
     onNextButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onSkipClick: () -> Unit = {}
+    onSkipClick: () -> Unit = {},
+    onBack: () -> Unit = {}
 ) {
     val screenHeightDp = getScreenHeight()
     val offsetY = (screenHeightDp * 0.65f)
@@ -80,23 +85,32 @@ internal fun AreaVerificationScreen(
                     }
                     .padding(8.dp)
             )
+
+            Text(
+                text = stringResource(R.string.alert_about_skip_area_verification),
+                style = AconTheme.typography.Body1,
+                color = AconTheme.color.Gray500,
+                fontWeight = FontWeight.W400,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(
+                        top = 96.dp
+                    )
+                    .graphicsLayer {
+                        alpha = skipAlertTextAlpha
+                    },
+                textAlign = TextAlign.Center
+            )
+        } else {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_topbar_arrow_left),
+                contentDescription = stringResource(R.string.back),
+                modifier = Modifier.padding(start = 16.dp, top = 32.dp).noRippleClickable {
+                    onBack()
+                }, tint = Color.Unspecified
+            )
         }
 
-        Text(
-            text = stringResource(R.string.alert_about_skip_area_verification),
-            style = AconTheme.typography.Body1,
-            color = AconTheme.color.Gray500,
-            fontWeight = FontWeight.W400,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(
-                    top = 96.dp
-                )
-                .graphicsLayer {
-                    alpha = skipAlertTextAlpha
-                },
-            textAlign = TextAlign.Center
-        )
         Column(
             modifier = Modifier
                 .fillMaxSize()

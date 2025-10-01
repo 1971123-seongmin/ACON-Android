@@ -1,6 +1,5 @@
 package com.acon.feature.onboarding.area.viewmodel
 
-import com.acon.acon.core.model.model.OnboardingPreferences
 import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.repository.OnboardingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

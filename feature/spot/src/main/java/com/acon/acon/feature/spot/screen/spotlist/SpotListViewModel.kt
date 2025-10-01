@@ -77,7 +77,7 @@ class SpotListViewModel @Inject constructor(
                     var showAreaVerificationModal = false
                     if (isCooldownExpiredUseCase(UserActionType.SKIP_AREA_VERIFICATION, 24 * 60 * 60) && signInStatus.value != SignInStatus.GUEST) {
                         showAreaVerificationModal = onboardingRepository.getOnboardingPreferences()
-                            .getOrNull()?.hasVerifiedArea == false
+                            .getOrNull()?.shouldVerifyArea == true
                     }
                     fetchSpotList(location,
                         Condition(
@@ -350,6 +350,10 @@ class SpotListViewModel @Inject constructor(
             }
         }
     }
+
+    fun onRegisterNewSpot() = intent {
+        postSideEffect(SpotListSideEffectV2.NavigateToUploadPlace)
+    }
 }
 
 sealed interface SpotListUiStateV2 {
@@ -399,6 +403,7 @@ sealed interface SpotListSideEffectV2 {
     data object ShowToastMessage : SpotListSideEffectV2
     data class NavigateToExternalMap(val handler: NavigationAppHandler) : SpotListSideEffectV2
     data class NavigateToSpotDetailScreen(val spot: Spot, val transportMode: TransportMode) : SpotListSideEffectV2
+    data object NavigateToUploadPlace : SpotListSideEffectV2
 }
 
 internal typealias FilterDetailKey = KClass<out Enum<*>>
