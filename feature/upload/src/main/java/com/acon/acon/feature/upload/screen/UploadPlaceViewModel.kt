@@ -346,9 +346,10 @@ class UploadPlaceViewModel @Inject constructor(
         onSuccess:() -> Unit,
         imageList: List<String> = emptyList()
     ) = intent {
+        // 지번 주소가 없으면 도로명 주소, 도로명 주소도 없으면 서버에 빈 문자열 전송
         uploadRepository.submitUploadPlace(
             spotName = state.selectedSpotByMap?.title ?: "",
-            address = state.selectedSpotByMap?.address ?: "",
+            address = state.selectedSpotByMap?.address ?: state.selectedSpotByMap?.roadAddress ?: "",
             spotType = state.selectedSpotType ?: SpotType.CAFE,
             featureList = state.featureList ?: emptyList(),
             recommendedMenu = state.recommendMenu ?: "",
