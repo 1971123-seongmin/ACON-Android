@@ -43,6 +43,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.acon.acon.core.analytics.amplitude.AconAmplitude
+import com.acon.acon.core.analytics.constants.EventNames
+import com.acon.acon.core.analytics.constants.PropertyKeys
 import com.acon.acon.core.common.UrlConstants
 import com.acon.acon.core.designsystem.R
 import com.acon.acon.core.designsystem.component.button.v2.AconFilledButton
@@ -53,17 +56,14 @@ import com.acon.acon.core.designsystem.effect.imageGradientLayer
 import com.acon.acon.core.designsystem.image.rememberDefaultLoadImageErrorPainter
 import com.acon.acon.core.designsystem.noRippleClickable
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.feature.spot.screen.component.OperationDot
-import com.acon.acon.feature.spot.screen.spotdetail.createBranchDeepLink
-import com.acon.acon.feature.spot.screen.spotlist.composable.SpotDetailLoadingView
-import com.acon.acon.core.analytics.amplitude.AconAmplitude
-import com.acon.acon.core.analytics.constants.EventNames
-import com.acon.acon.core.analytics.constants.PropertyKeys
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
 import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.core.ui.compose.getTextSizeDp
+import com.acon.acon.feature.spot.screen.component.OperationDot
+import com.acon.acon.feature.spot.screen.spotdetail.createBranchDeepLink
+import com.acon.acon.feature.spot.screen.spotlist.composable.SpotDetailLoadingView
 import dev.chrisbanes.haze.hazeSource
 import okhttp3.internal.immutableListOf
 
@@ -348,7 +348,7 @@ internal fun SpotDetailScreen(
 
                         Text(
                             text = if (isStoreOpen) state.spotDetail.closingTime else state.spotDetail.nextOpening,
-                            color = AconTheme.color.Gray200,
+                            color =  if (isStoreOpen) AconTheme.color.White else AconTheme.color.Gray200,
                             style = AconTheme.typography.Body1,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(start = 12.dp)
@@ -356,7 +356,7 @@ internal fun SpotDetailScreen(
 
                         Text(
                             text = stringResource(R.string.store_closed),
-                            color = AconTheme.color.Gray200,
+                            color = if (isStoreOpen) AconTheme.color.White else AconTheme.color.Gray200,
                             style = AconTheme.typography.Body1,
                             fontWeight = FontWeight.Normal,
                             modifier = Modifier.padding(start = 4.dp)
