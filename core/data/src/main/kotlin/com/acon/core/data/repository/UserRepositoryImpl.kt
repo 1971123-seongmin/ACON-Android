@@ -77,8 +77,6 @@ class UserRepositoryImpl @Inject constructor(
             )
         }.onSuccess {
             profileLocalDataSource.clearCache()
-            onboardingRepository.updateShouldVerifyArea(true)
-            onboardingRepository.updateShouldChooseDislikes(true)
             clearSession()
         }
     }
@@ -94,8 +92,6 @@ class UserRepositoryImpl @Inject constructor(
             )
         }.onSuccess {
             profileLocalDataSource.clearCache()
-            onboardingRepository.updateShouldVerifyArea(true)
-            onboardingRepository.updateShouldChooseDislikes(true)
             clearSession()
         }
     }
