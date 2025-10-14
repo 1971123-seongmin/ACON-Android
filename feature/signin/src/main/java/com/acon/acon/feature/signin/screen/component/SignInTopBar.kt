@@ -31,7 +31,7 @@ fun SignInTopBar(
         Text(
             text = stringResource(R.string.signin_topbar_text),
             style = AconTheme.typography.Body1,
-            color = AconTheme.color.White,
+            color = AconTheme.color.Gray500,
             modifier = Modifier
                 .padding(8.dp)
                 .noRippleClickable { onClickText() }

@@ -1,0 +1,84 @@
+package com.acon.acon.navigation.nested
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import com.acon.acon.BuildConfig
+import com.acon.acon.core.designsystem.theme.AconTheme
+import com.acon.acon.core.navigation.route.AreaVerificationRoute
+import com.acon.acon.core.navigation.route.OnboardingRoute
+import com.acon.acon.core.navigation.route.ProfileRoute
+import com.acon.acon.core.navigation.route.SettingsRoute
+import com.acon.acon.core.navigation.route.SignInRoute
+import com.acon.acon.core.navigation.utils.navigateAndClear
+import com.acon.acon.feature.settings.screen.composable.SettingsScreenContainer
+import com.acon.acon.feature.verification.screen.composable.UserVerifiedAreasScreenContainer
+import com.acon.acon.feature.withdraw.screen.composable.DeleteAccountScreenContainer
+
+internal fun NavGraphBuilder.settingsNavigation(
+    navController: NavHostController
+) {
+    val versionName = BuildConfig.VERSION_NAME
+
+    navigation<SettingsRoute.Graph>(
+        startDestination = SettingsRoute.Settings,
+    ) {
+        composable<SettingsRoute.Settings> {
+            SettingsScreenContainer(
+                modifier = Modifier.fillMaxSize(),
+                versionName = versionName,
+                onNavigateToProfileScreen = {
+                    navController.navigate(ProfileRoute.ProfileInfo) {
+                        popUpTo(SettingsRoute.Graph) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToOnboardingScreen = {
+                    navController.navigate(OnboardingRoute.Graph)
+                },
+                onNavigateUserVerifiedAreasScreen = {
+                    navController.navigate(SettingsRoute.UserVerifiedAreas)
+                },
+                onNavigateToSignInScreen = {
+                    navController.navigateAndClear(SignInRoute.SignIn)
+                },
+                onNavigateToDeleteAccountScreen = {
+                    navController.navigate(SettingsRoute.DeleteAccount)
+                }
+            )
+        }
+
+        composable<SettingsRoute.UserVerifiedAreas> {
+            UserVerifiedAreasScreenContainer(
+                modifier = Modifier.fillMaxSize().background(AconTheme.color.Gray900),
+                navigateToSettingsScreen = navController::popBackStack,
+                navigateToAreaVerification = {
+                    navController.navigate(
+                        AreaVerificationRoute.AreaVerification
+                    )
+                }
+            )
+        }
+
+        composable<SettingsRoute.DeleteAccount> {
+            DeleteAccountScreenContainer(
+                modifier = Modifier.fillMaxSize().background(AconTheme.color.Gray900),
+                navigateToSettings = {
+                    navController.navigateUp()
+                },
+                navigateToSignIn = {
+                    navController.navigate(SignInRoute.SignIn) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+    }
+}

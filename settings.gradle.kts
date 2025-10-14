@@ -21,11 +21,11 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Acon"
+rootProject.name = "ACON-Android"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 includeBuild("build-logic")
 
-include(":app")
+include(":acon")
 
 include(
     ":core:designsystem",
@@ -34,21 +34,20 @@ include(
 )
 
 include(
-    ":feature:areaverification",
     ":feature:spot",
     ":feature:signin",
     ":feature:upload",
     ":feature:onboarding"
 )
 
-include(":data")
 include(":domain")
 include(":feature:profile")
 include(":feature:settings")
 include(":core:analytics")
-include(":core:ads-api")
+include(":core:ads")
 include(":core:ui")
 include(":core:model")
 include(":core:navigation")
-include(":provider:ads-impl")
 include(":core:launcher")
+include(":core:social")
+include(":core:data")

@@ -4,17 +4,19 @@ import com.acon.acon.domain.error.RootError
 
 open class ValidateNicknameError : RootError() {
 
-    class UnsatisfiedCondition : ValidateNicknameError() {
+    class EmptyInput : ValidateNicknameError()
+    class InputLengthExceeded : ValidateNicknameError()
+    class InvalidFormat : ValidateNicknameError() {
         override val code: Int = 40051
     }
-    class AlreadyUsedNickname : ValidateNicknameError() {
+    class AlreadyExist : ValidateNicknameError() {
         override val code: Int = 40901
     }
 
     final override fun createErrorInstances(): Array<RootError> {
         return arrayOf(
-            UnsatisfiedCondition(),
-            AlreadyUsedNickname()
+            InvalidFormat(),
+            AlreadyExist()
         )
     }
 }

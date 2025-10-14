@@ -4,7 +4,6 @@ import android.content.Context
 import android.location.Location
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastForEach
-import androidx.lifecycle.viewModelScope
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.analytics.constants.PropertyKeys
@@ -19,19 +18,18 @@ import com.acon.acon.core.model.type.SpotType
 import com.acon.acon.core.model.type.TagType
 import com.acon.acon.core.model.type.TransportMode
 import com.acon.acon.core.model.type.UserActionType
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.ui.android.NavigationAppHandler
 import com.acon.acon.core.ui.android.isInKorea
 import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.error.spot.FetchSpotListError
-import com.acon.acon.domain.repository.ProfileRepository
+import com.acon.acon.domain.repository.OnboardingRepository
 import com.acon.acon.domain.repository.SpotRepository
 import com.acon.acon.domain.repository.TimeRepository
 import com.acon.acon.domain.usecase.IsCooldownExpiredUseCase
 import com.acon.acon.domain.usecase.IsDistanceExceededUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
@@ -43,7 +41,7 @@ import kotlin.reflect.KClass
 class SpotListViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val spotRepository: SpotRepository,
-    private val profileRepository: ProfileRepository,
+    private val onboardingRepository: OnboardingRepository,
     private val timeRepository: TimeRepository,
     private val isDistanceExceededUseCase: IsDistanceExceededUseCase,
     private val isCooldownExpiredUseCase: IsCooldownExpiredUseCase
@@ -77,9 +75,10 @@ class SpotListViewModel @Inject constructor(
                 initialLocation = location
                 if (location.isInKorea(context)) {
                     var showAreaVerificationModal = false
-                    if (isCooldownExpiredUseCase(UserActionType.SKIP_AREA_VERIFICATION, 24 * 60 * 60) && userType.value != UserType.GUEST)
-                        showAreaVerificationModal =
-                            profileRepository.fetchVerifiedAreaList().takeIf { it.isSuccess }?.getOrNull()?.isEmpty() == true
+                    if (isCooldownExpiredUseCase(UserActionType.SKIP_AREA_VERIFICATION, 24 * 60 * 60) && signInStatus.value != SignInStatus.GUEST) {
+                        showAreaVerificationModal = onboardingRepository.getOnboardingPreferences()
+                            .getOrNull()?.shouldVerifyArea == true
+                    }
                     fetchSpotList(location,
                         Condition(
                             state.selectedSpotType,
@@ -351,6 +350,10 @@ class SpotListViewModel @Inject constructor(
             }
         }
     }
+
+    fun onRegisterNewSpot() = intent {
+        postSideEffect(SpotListSideEffectV2.NavigateToUploadPlace)
+    }
 }
 
 sealed interface SpotListUiStateV2 {
@@ -400,6 +403,7 @@ sealed interface SpotListSideEffectV2 {
     data object ShowToastMessage : SpotListSideEffectV2
     data class NavigateToExternalMap(val handler: NavigationAppHandler) : SpotListSideEffectV2
     data class NavigateToSpotDetailScreen(val spot: Spot, val transportMode: TransportMode) : SpotListSideEffectV2
+    data object NavigateToUploadPlace : SpotListSideEffectV2
 }
 
 internal typealias FilterDetailKey = KClass<out Enum<*>>

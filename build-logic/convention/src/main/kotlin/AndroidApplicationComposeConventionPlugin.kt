@@ -20,6 +20,7 @@ class AndroidApplicationComposeConventionPlugin: Plugin<Project> {
             extensions.configure<ApplicationExtension> {
                 buildFeatures {
                     compose = true
+                    buildConfig = true
                 }
                 composeOptions {
                     kotlinCompilerExtensionVersion =

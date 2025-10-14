@@ -3,12 +3,12 @@ package com.acon.acon.feature.signin.screen
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.analytics.constants.PropertyKeys
-import com.acon.acon.core.model.model.user.VerificationStatus
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.model.user.ExternalUUID
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.ui.base.BaseContainerHost
 import com.acon.acon.domain.repository.OnboardingRepository
-import com.acon.acon.domain.repository.ProfileRepository
 import com.acon.acon.domain.repository.UserRepository
+import com.acon.core.social.client.SocialAuthClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.Container
@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val profileRepository: ProfileRepository,
     private val onboardingRepository: OnboardingRepository,
     private val userRepository: UserRepository
 ) : BaseContainerHost<SignInUiState, SignInSideEffect>() {
@@ -26,24 +25,25 @@ class SignInViewModel @Inject constructor(
         container(initialState = SignInUiState.SignIn())
 
     fun signIn() = intent {
-        if (userType.value == UserType.GUEST) {
+        if (signInStatus.value == SignInStatus.GUEST) {
             reduce {
                 SignInUiState.SignIn(showSignInInfo = true)
             }
         } else {
-            userRepository.getDidOnboarding().onSuccess { did ->
-                if (!did)
-                    postSideEffect(SignInSideEffect.NavigateToOnboarding)
-                else {
-                    if (onboardingRepository.getDidOnboarding().getOrDefault(true))
-                        postSideEffect(SignInSideEffect.NavigateToSpotListView)
-                    else
-                        postSideEffect(SignInSideEffect.NavigateToIntroduce)
-                }
+            onboardingRepository.getOnboardingPreferences().onSuccess {
+                if (it.shouldShowIntroduce)
+                    postSideEffect(SignInSideEffect.NavigateToIntroduce)
+                else if (it.shouldVerifyArea)
+                    postSideEffect(SignInSideEffect.NavigateToAreaVerification)
+                else if (it.shouldChooseDislikes)
+                    postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
+                else
+                    postSideEffect(SignInSideEffect.NavigateToSpotListView)
+
             }
         }
-        userType.collectLatest {
-            if (it == UserType.GUEST) {
+        signInStatus.collectLatest {
+            if (it == SignInStatus.GUEST) {
                 reduce {
                     SignInUiState.SignIn(showSignInInfo = true)
                 }
@@ -52,30 +52,45 @@ class SignInViewModel @Inject constructor(
     }
 
     fun onSkipButtonClicked() = intent {
-        if (onboardingRepository.getDidOnboarding().getOrDefault(true)) {
-            postSideEffect(SignInSideEffect.NavigateToSpotListView)
-        } else {
+        if (onboardingRepository.getOnboardingPreferences().getOrNull()?.shouldShowIntroduce == true) {
             postSideEffect(SignInSideEffect.NavigateToIntroduce)
+        } else {
+            postSideEffect(SignInSideEffect.NavigateToSpotListView)
         }
     }
 
-    fun onSignInComplete(verificationStatus: VerificationStatus) = intent {
+    fun onSignInButtonClicked(socialAuthClient: SocialAuthClient) = intent {
+        val platform = socialAuthClient.platform
+        val code = socialAuthClient.getCredentialCode()
+
+        userRepository.signIn(platform, code ?: return@intent).onSuccess { externalUUID ->
+            onSignInComplete(externalUUID)
+        }.onFailure {
+            postSideEffect(SignInSideEffect.ShowToastMessage)
+        }
+    }
+
+    private fun onSignInComplete(externalUUID: ExternalUUID) = intent {
         AconAmplitude.trackEvent(
             eventName = EventNames.SIGN_IN,
             properties = mapOf(
                 PropertyKeys.SIGN_IN_OR_NOT to true
             )
         )
-        if (verificationStatus.hasVerifiedArea.not()) {
-            postSideEffect(SignInSideEffect.NavigateToAreaVerification)
-        } else if (verificationStatus.hasPreference.not()) {
-            postSideEffect(SignInSideEffect.NavigateToOnboarding)
-        } else if (onboardingRepository.getDidOnboarding().getOrDefault(true)) {
+        onboardingRepository.getOnboardingPreferences().onSuccess { pref ->
+            if (pref.shouldShowIntroduce) {
+                postSideEffect(SignInSideEffect.NavigateToIntroduce)
+            } else if (pref.shouldVerifyArea) {
+                postSideEffect(SignInSideEffect.NavigateToAreaVerification)
+            } else if (pref.shouldChooseDislikes) {
+                postSideEffect(SignInSideEffect.NavigateToChooseDislikes)
+            } else {
+                postSideEffect(SignInSideEffect.NavigateToSpotListView)
+            }
+        }.onFailure {
             postSideEffect(SignInSideEffect.NavigateToSpotListView)
-        } else {
-            postSideEffect(SignInSideEffect.NavigateToIntroduce)
         }
-        AconAmplitude.setUserId(verificationStatus.externalUUID)
+        AconAmplitude.setUserId(externalUUID.value)
     }
 
     fun onClickTermsOfUse() = intent {
@@ -105,7 +120,7 @@ sealed interface SignInSideEffect {
     data object ShowToastMessage : SignInSideEffect
     data object NavigateToSpotListView : SignInSideEffect
     data object NavigateToAreaVerification : SignInSideEffect
-    data object NavigateToOnboarding : SignInSideEffect
+    data object NavigateToChooseDislikes : SignInSideEffect
     data object OnClickTermsOfUse : SignInSideEffect
     data object OnClickPrivacyPolicy : SignInSideEffect
     data object NavigateToIntroduce : SignInSideEffect

@@ -121,7 +121,7 @@
     <string name="area_verification_settings">settings</string>
     <string name="area_verification_topbar">지역인증</string>
     <string name="area_verification_main_title">믿을 수 있는 리뷰를 위해\n지역인증이 필요해요</string>
-    <string name="area_verification_main_subtitle">더 정확한 로컬맛집을 추천해드릴 수 있어요</string>
+    <string name="area_verification_main_subtitle">내 지역에 남긴 리뷰는 추천 장소에 반영돼요</string>
     <string name="area_verification_one_second_verify">1초만에 인증하기</string>
     <string name="area_verification_popup">인증 지역은 프로필에서 수정 가능합니다.</string>
     <string name="photo_permission_title">\'Acon\'에 대해 라이브러리\n읽기\/쓰기 권한이 없습니다.</string>
@@ -168,7 +168,7 @@
     <string name="apologize_for_no_spots">원하시는 결과를 보여드리지 못해 죄송해요</string>
     <string name="recommend_other_spots">대신 여기는 어떠세요?</string>
     <string name="no_other_spots">다음에 들어오실 땐,\n꼭 찾아서 추천드릴게요</string>
-    <string name="ask_for_new_spot">장소 등록 신청하기</string>
+    <string name="ask_for_new_spot">장소 직접 등록하기</string>
     <string name="walking_eta">도보 %d분 길찾기</string>
     <string name="biking_eta">자전거로 %d분 길찾기</string>
     <string name="refresh_spot">지금 위치 기준으로 다시 추천 받기</string>
@@ -270,7 +270,7 @@
     <string name="user_choose_none">모든 음식을 잘 드시는 분이군요!</string>
     <string name="user_choose_dislike_food">확인했어요! 센스있게 추천해드릴게요</string>
     <string name="start">시작하기</string>
-    <string name="stop_onboarding">취향탐색을 그만둘까요?</string>
+    <string name="stop_choose_dislikes">취향탐색을 그만둘까요?</string>
     <string name="keep_going">계속하기</string>
     <string name="stop">그만두기</string>
     <string name="success_save">저장되었습니다</string>
@@ -293,8 +293,9 @@
     <string name="edit_profile">프로필 수정하기</string>
     <string name="star">*</string>
     <string name="max_nickname_count">/14</string>
+    <string name="nickname_input_count">%d/%d</string>
     <string name="nickname_textfield_title">닉네임</string>
-    <string name="nickname_birthday_title">생년월일</string>
+    <string name="birthdate_field_title">생년월일</string>
     <string name="birthday_placeholder">2025.01.01</string>
     <string name="nickname_valid">사용할 수 있는 닉네임이에요.</string>
     <string name="nickname_error_empty">닉네임을 입력해주세요.</string>

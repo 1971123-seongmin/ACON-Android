@@ -29,3 +29,7 @@ fun DependencyHandler.androidTestImplementation(dependency: Any) {
 fun DependencyHandler.testImplementation(dependency: Any) {
     add("testImplementation", dependency)
 }
+
+fun DependencyHandler.testRuntimeOnly(dependency: Any) {
+    add("testRuntimeOnly", dependency)
+}

@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +23,7 @@ import com.acon.acon.feature.spot.toPriceString
 
 @Composable
 internal fun SignatureMenu(
-    signatureMenuList: List<com.acon.acon.core.model.model.spot.SignatureMenu>
+    signatureMenuList: List<SignatureMenu>
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -43,16 +43,22 @@ internal fun SignatureMenuItem(
     menuPrice: String
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = menuName,
-            color = AconTheme.color.White,
-            style = AconTheme.typography.Body1,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(min = 100.dp, max = 160.dp)
-        )
+        Box(
+            modifier = Modifier.width(160.dp)
+        ) {
+            Text(
+                text = menuName,
+                color = AconTheme.color.White,
+                style = AconTheme.typography.Body1,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart)
+            )
+        }
 
         Spacer(Modifier.width(8.dp))
         Text(

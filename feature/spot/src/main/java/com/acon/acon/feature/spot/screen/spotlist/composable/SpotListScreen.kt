@@ -44,14 +44,14 @@ import com.acon.acon.core.model.model.spot.Spot
 import com.acon.acon.core.model.type.CafeFilterType
 import com.acon.acon.core.model.type.RestaurantFilterType
 import com.acon.acon.core.model.type.SpotType
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.feature.spot.mock.spotListUiStateRestaurantMock
 import com.acon.acon.feature.spot.screen.component.SpotTypeToggle
 import com.acon.acon.feature.spot.screen.spotlist.FilterDetailKey
 import com.acon.acon.feature.spot.screen.spotlist.SpotListUiStateV2
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.core.ui.compose.getScreenHeight
 import com.acon.acon.core.ui.android.NavigationAppHandler
 import dev.chrisbanes.haze.hazeSource
@@ -74,7 +74,8 @@ internal fun SpotListScreen(
     onNavigateToUploadScreen: () -> Unit = {},
     onNavigateToProfileScreen: () -> Unit = {},
     onDismissAreaVerificationModalRequest: () -> Unit = {},
-    onNavigateToAreaVerificationScreen: () -> Unit = {}
+    onNavigateToAreaVerificationScreen: () -> Unit = {},
+    onRegisterNewSpotClick: () -> Unit = {}
 ) {
     val screenHeightDp = getScreenHeight()
     val screenHeightPx = with(LocalDensity.current) {
@@ -88,7 +89,7 @@ internal fun SpotListScreen(
     var pagerState = rememberPagerState { 0 }
     val scope = rememberCoroutineScope()
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val onSignInRequired = LocalRequestSignIn.current
 
     if (state.showAreaVerificationModal) {
@@ -119,7 +120,7 @@ internal fun SpotListScreen(
             SpotTypeToggle(
                 selectedType = state.selectedSpotType,
                 onSwitched = {
-                    if (userType == UserType.GUEST)
+                    if (userType == SignInStatus.GUEST)
                         onSignInRequired("click_toggle_guest?")
                     else
                         onSpotTypeChanged(it)
@@ -135,7 +136,7 @@ internal fun SpotListScreen(
                     .align(Alignment.CenterEnd)
                     .padding(end = 16.dp)
                     .noRippleClickable {
-                        if (userType == com.acon.acon.core.model.type.UserType.GUEST)
+                        if (userType == com.acon.acon.core.model.type.SignInStatus.GUEST)
                             onSignInRequired("")
                         else
                             onFilterButtonClick()
@@ -190,13 +191,14 @@ internal fun SpotListScreen(
                                 SpotListSuccessView(
                                     pagerState = pagerState,
                                     state = state,
-                                    userType = userType,
+                                    signInStatus = userType,
                                     onSpotClick = onSpotClick,
                                     onTryFindWay = onTryFindWay,
                                     itemHeightPx = itemHeightPx,
                                     modifier = Modifier.fillMaxSize(),
                                     onNavigationAppChoose = onNavigationAppChoose,
-                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss
+                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss,
+                                    onRegisterNewSpotClick = onRegisterNewSpotClick
                                 )
                             }
 
@@ -221,13 +223,14 @@ internal fun SpotListScreen(
                                 SpotListSuccessView(
                                     pagerState = pagerState,
                                     state = state,
-                                    userType = userType,
+                                    signInStatus = userType,
                                     onSpotClick = onSpotClick,
                                     onTryFindWay = onTryFindWay,
                                     itemHeightPx = itemHeightPx,
                                     modifier = Modifier.fillMaxSize(),
                                     onNavigationAppChoose = onNavigationAppChoose,
-                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss
+                                    onChooseNavigationAppModalDismiss = onChooseNavigationAppModalDismiss,
+                                    onRegisterNewSpotClick = onRegisterNewSpotClick
                                 )
                             }
                         }
@@ -284,7 +287,7 @@ internal fun SpotListScreen(
                         }
                     }
                     BottomNavType.UPLOAD -> {
-                        if (userType == com.acon.acon.core.model.type.UserType.GUEST) {
+                        if (userType == com.acon.acon.core.model.type.SignInStatus.GUEST) {
                             onSignInRequired("click_upload_guest?")
                         } else {
                             onNavigateToUploadScreen()

@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.acon.acon.core.analytics.amplitude.AconAmplitude
 import com.acon.acon.core.analytics.constants.EventNames
 import com.acon.acon.core.analytics.constants.PropertyKeys
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.core.navigation.route.SpotRoute
 import com.acon.acon.core.navigation.type.spotNavigationParameterNavType
 import com.acon.acon.core.ui.base.BaseContainerHost
@@ -15,6 +16,7 @@ import com.acon.acon.domain.repository.SpotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
 import javax.annotation.concurrent.Immutable
@@ -43,21 +45,7 @@ class SpotDetailViewModel @Inject constructor(
 
     override val container =
         container<SpotDetailUiState, SpotDetailSideEffect>(SpotDetailUiState.Loading) {
-            userType.collect {
-                when (it) {
-                    com.acon.acon.core.model.type.UserType.GUEST -> {
-                        if (spotNavData.isFromDeepLink == true) {
-                            fetchedSpotDetail()
-                        } else {
-                            reduce { SpotDetailUiState.LoadFailed() }
-                        }
-                    }
-
-                    else -> {
-                        fetchedSpotDetail()
-                    }
-                }
-            }
+            fetchedSpotDetail()
         }
 
     private fun fetchedSpotDetail() = intent {
@@ -68,22 +56,22 @@ class SpotDetailViewModel @Inject constructor(
         val isDeepLink = spotNavData.isFromDeepLink == true
 
         val spotDetailDeferred = viewModelScope.async {
-            if (isDeepLink) {
+            if (signInStatus.value == SignInStatus.GUEST) {
                 spotRepository.fetchSpotDetail(
                     spotId = spotNavData.spotId,
-                    isDeepLink = true
+                    isDeepLink = isDeepLink
                 )
             } else {
                 spotRepository.fetchSpotDetailFromUser(
-                    spotId = spotNavData.spotId
+                    spotId = spotNavData.spotId,
                 )
             }
         }
 
         // GUEST 인 경우 빈 리스트
         val verifiedAreaListDeferred = viewModelScope.async {
-            if (userType.value != com.acon.acon.core.model.type.UserType.GUEST) {
-                profileRepository.fetchVerifiedAreaList()
+            if (signInStatus.value != SignInStatus.GUEST) {
+                profileRepository.getVerifiedAreas().firstOrNull()
             } else {
                 Result.success(emptyList())
             }
@@ -94,7 +82,7 @@ class SpotDetailViewModel @Inject constructor(
 
         reduce {
             val isAreaVerified = verifiedAreaListResult
-                .getOrNull()
+                ?.getOrNull()
                 .orEmpty()
                 .isNotEmpty()
 

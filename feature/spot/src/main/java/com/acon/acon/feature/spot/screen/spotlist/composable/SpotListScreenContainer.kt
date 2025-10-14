@@ -11,13 +11,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.acon.acon.core.model.model.spot.SpotNavigationParameter
 import com.acon.acon.core.model.model.spot.Spot
 import com.acon.acon.core.model.type.TransportMode
-import com.acon.acon.core.model.type.UserType
+import com.acon.acon.core.model.type.SignInStatus
 import com.acon.acon.feature.spot.screen.spotlist.SpotListSideEffectV2
 import com.acon.acon.feature.spot.screen.spotlist.SpotListViewModel
 import com.acon.acon.core.ui.compose.LocalDeepLinkHandler
 import com.acon.acon.core.ui.compose.LocalOnRetry
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 import com.acon.acon.feature.spot.screen.spotlist.SpotListUiStateV2
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
@@ -32,13 +32,14 @@ fun SpotListScreenContainer(
     onNavigateToAreaVerificationScreen: (latitude: Double, longitude: Double) -> Unit,
     modifier: Modifier = Modifier,
     onNavigateToDeeplinkSpotDetailScreen: (spotNav: SpotNavigationParameter) -> Unit = {},
+    onNavigateToUploadPlace: () -> Unit = {},
     viewModel: SpotListViewModel = hiltViewModel()
 ) {
     val state by viewModel.collectAsState()
     val deepLinkHandler = LocalDeepLinkHandler.current
     val context = LocalContext.current
 
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
     val onSignInRequired = LocalRequestSignIn.current
 
     LaunchedEffect(Unit) {
@@ -63,12 +64,7 @@ fun SpotListScreenContainer(
         SpotListScreen(
             state = state,
             onSpotTypeChanged = viewModel::onSpotTypeClicked,
-            onSpotClick = { spot, rank ->
-                if (userType == UserType.GUEST)
-                    onSignInRequired("click_detail_guest?")
-                else
-                    viewModel.onSpotClicked(spot, rank)
-            },
+            onSpotClick = viewModel::onSpotClicked,
             onTryFindWay = viewModel::onTryFindWay,
             onNavigationAppChoose = viewModel::onNavigationAppChosen,
             onChooseNavigationAppModalDismiss = viewModel::onChooseNavigationAppModalDismissed,
@@ -84,12 +80,18 @@ fun SpotListScreenContainer(
                 val lat = (state as? SpotListUiStateV2.Success)?.currentLocation?.latitude ?: 0.0
                 val lon = (state as? SpotListUiStateV2.Success)?.currentLocation?.longitude ?: 0.0
                 onNavigateToAreaVerificationScreen(lat, lon)
+            },
+            onRegisterNewSpotClick = {
+                if (userType == SignInStatus.GUEST)
+                    onSignInRequired("")
+                else
+                    viewModel.onRegisterNewSpot()
             }
         )
     }
 
     viewModel.requestLocationPermission()
-    viewModel.useUserType()
+    viewModel.useSignInStatus()
     viewModel.useLiveLocation()
     viewModel.collectSideEffect {
         when (it) {
@@ -103,6 +105,10 @@ fun SpotListScreenContainer(
 
             is SpotListSideEffectV2.NavigateToExternalMap -> {
                 it.handler.startNavigationApp(context)
+            }
+
+            is SpotListSideEffectV2.NavigateToUploadPlace -> {
+                onNavigateToUploadPlace()
             }
         }
     }

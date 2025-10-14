@@ -53,14 +53,10 @@ import com.acon.acon.core.designsystem.effect.imageGradientBottomLayer
 import com.acon.acon.core.designsystem.effect.imageGradientTopLayer
 import com.acon.acon.core.designsystem.image.rememberDefaultLoadImageErrorPainter
 import com.acon.acon.core.designsystem.theme.AconTheme
-import com.acon.acon.core.model.model.spot.Spot
-import com.acon.acon.core.model.type.TagType
-import com.acon.acon.core.model.type.TransportMode
-import com.acon.acon.core.model.type.UserType
 import com.acon.acon.feature.spot.mock.spotListUiStateRestaurantMock
 import com.acon.acon.feature.spot.screen.component.OperationDot
 import com.acon.acon.core.ui.compose.LocalRequestSignIn
-import com.acon.acon.core.ui.compose.LocalUserType
+import com.acon.acon.core.ui.compose.LocalSignInStatus
 
 @Composable
 internal fun SpotItem(
@@ -119,7 +115,7 @@ private fun SpotInfo(
 ) {
 
     val onSignInRequired = LocalRequestSignIn.current
-    val userType = LocalUserType.current
+    val userType = LocalSignInStatus.current
 
     Column(
         modifier = modifier
@@ -205,7 +201,7 @@ private fun SpotInfo(
         AconFilledButton(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
-                if (userType == com.acon.acon.core.model.type.UserType.GUEST)
+                if (userType == com.acon.acon.core.model.type.SignInStatus.GUEST)
                     onSignInRequired("click_home_navigation_guest?")
                 else
                     onFindWayButtonClick(spot)

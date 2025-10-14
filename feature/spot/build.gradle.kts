@@ -15,7 +15,7 @@ android {
 dependencies {
 
     implementation(projects.core.map)
-    implementation(projects.core.adsApi)
+    implementation(projects.core.ads)
 
     implementation(libs.branch.io)
     implementation(libs.pulltorefresh)

@@ -1,0 +1,102 @@
+package com.acon.core.data.repository
+
+import com.acon.acon.core.model.model.user.CredentialCode
+import com.acon.acon.core.model.model.user.SocialPlatform
+import com.acon.acon.core.model.model.user.ExternalUUID
+import com.acon.acon.data.dto.request.DeleteAccountRequest
+import com.acon.acon.domain.error.user.PostSignInError
+import com.acon.acon.domain.error.user.PostSignOutError
+import com.acon.acon.domain.repository.OnboardingRepository
+import com.acon.acon.domain.repository.UserRepository
+import com.acon.core.data.datasource.local.ProfileLocalDataSource
+import com.acon.core.data.datasource.local.TokenLocalDataSource
+import com.acon.core.data.datasource.remote.UserRemoteDataSource
+import com.acon.core.data.dto.request.SignInRequest
+import com.acon.core.data.dto.request.SignOutRequest
+import com.acon.core.data.error.runCatchingWith
+import com.acon.core.data.session.SessionHandler
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import javax.inject.Inject
+
+class UserRepositoryImpl @Inject constructor(
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val tokenLocalDataSource: TokenLocalDataSource,
+    private val sessionHandler: SessionHandler,
+    private val onboardingRepository: OnboardingRepository,
+    private val profileLocalDataSource: ProfileLocalDataSource
+) : UserRepository {
+
+    override fun getSignInStatus() = sessionHandler.getUserType()
+
+    override suspend fun signIn(
+        socialType: SocialPlatform,
+        code: CredentialCode
+    ): Result<ExternalUUID> {
+        return runCatchingWith(PostSignInError()) {
+            val signInResponse = userRemoteDataSource.signIn(
+                SignInRequest(
+                    platform = socialType,
+                    idToken = code.value
+                )
+            )
+
+            sessionHandler.completeSignIn(
+                signInResponse.accessToken.orEmpty(),
+                signInResponse.refreshToken.orEmpty()
+            )
+
+            coroutineScope {
+                val shouldVerifyAreaJob = async {
+                    onboardingRepository.updateShouldVerifyArea(!signInResponse.hasVerifiedArea)
+                }
+                val shouldChooseDislikesJob = async {
+                    onboardingRepository.updateShouldChooseDislikes(!signInResponse.hasPreference)
+                }
+
+                val shouldShowIntroduceJob = async {
+                    onboardingRepository.updateShouldShowIntroduce(
+                        (onboardingRepository.getOnboardingPreferences().getOrNull()?.shouldShowIntroduce == true)
+                                && !signInResponse.hasVerifiedArea
+                                && !signInResponse.hasPreference
+                    )
+                }
+                awaitAll(shouldVerifyAreaJob, shouldChooseDislikesJob, shouldShowIntroduceJob)
+            }
+
+            ExternalUUID(signInResponse.externalUUID)
+        }
+    }
+
+    override suspend fun signOut(): Result<Unit> {
+        val refreshToken = tokenLocalDataSource.getRefreshToken() ?: ""
+        return runCatchingWith(PostSignOutError()) {
+            userRemoteDataSource.signOut(
+                SignOutRequest(refreshToken = refreshToken)
+            )
+        }.onSuccess {
+            profileLocalDataSource.clearCache()
+            clearSession()
+        }
+    }
+
+    override suspend fun deleteAccount(reason: String): Result<Unit> {
+        val refreshToken = tokenLocalDataSource.getRefreshToken() ?: ""
+        return runCatchingWith {
+            userRemoteDataSource.deleteAccount(
+                DeleteAccountRequest(
+                    reason = reason,
+                    refreshToken = refreshToken
+                )
+            )
+        }.onSuccess {
+            profileLocalDataSource.clearCache()
+            clearSession()
+        }
+    }
+
+    override suspend fun clearSession() = runCatchingWith {
+        sessionHandler.clearSession()
+    }
+}

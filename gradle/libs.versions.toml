@@ -4,11 +4,11 @@ projectApplicationId = "com.acon.acon"
 projectCompileSdk = "35"
 projectTargetSdk = "35"
 projectMinSdk = "28"
-projectVersionCode = "20010010"
-projectVersionName = "2.1.1"
+projectVersionCode = "20010020"
+projectVersionName = "2.1.2"
 #######################################
 
-composeCompilerVersion = "1.5.1"
+composeCompilerVersion = "1.5.15"
 agp = "8.6.0"
 androidTools = "31.9.1"
 coilCompose = "3.0.4"
@@ -18,13 +18,13 @@ haze = "1.2.1"
 credentials = "1.3.0"
 googleid = "1.1.1"
 kotlin = "2.0.21"
+ksp = "2.0.21-1.0.27"
 coreKtx = "1.16.0"
 lifecycleRuntimeKtx = "2.8.7"
 composeBom = "2025.05.01"
 appcompat = "1.7.0"
 mapSdk = "3.21.0"
 material = "1.12.0"
-jetbrainsKotlinJvm = "2.0.21"
 navigationCompose = "2.8.2"
 kotlinxSerializationJson = "1.7.3"
 okhttp = "4.12.0"
@@ -32,13 +32,11 @@ pulltorefresh = "0.2.0"
 retrofitKotlinSerializationConverter = "1.0.0"
 retrofit = "2.11.0"
 securityCryptoKtx = "1.1.0-alpha06"
-ksp = "2.0.21-1.0.27"
 hilt = "2.52"
 hiltCompose = "1.2.0"
 javaxInject = "1"
-orbit = "9.0.0"
+orbit = "10.0.0"
 coroutine = "1.7.3"
-dataStoreVersion = "1.1.0"
 paging-compose = "3.3.6"
 
 amplitudeVersion = "1.20.1"
@@ -47,6 +45,10 @@ firebaseBom = "33.12.0"
 firebaseCrashlytics = "3.0.3"
 googleServices = "4.4.2"
 ads = "24.3.0"
+
+# DataStore
+dataStoreVersion = "1.1.7"
+protobufKotlinLite = "4.32.0"
 
 ## Naver Map
 naverMapCompose = "1.8.0"
@@ -78,6 +80,7 @@ junit5 = "5.10.2"
 junitAndroid = "1.2.1"
 mockk = "1.13.10"
 turbine = "1.2.1"
+kotest = "5.9.1"
 
 # Android Test
 junitComposeVersion = "1.8.2"
@@ -130,12 +133,18 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutine" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine"}
+orbit-test = { module = "org.orbit-mvi:orbit-test", version.ref = "orbit"}
+kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
 
 # Android Testing
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitAndroid" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "junitComposeVersion" }
+androidx-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
 
 # Paging
 androidx-paignig-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-compose" }
@@ -202,6 +211,8 @@ firebase-crashlytics-sdk = { group = "com.google.firebase", name = "firebase-cra
 
 # DataStore
 preferences-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStoreVersion" }
+proto-datastore = { module = "androidx.datastore:datastore", version.ref = "dataStoreVersion" }
+protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobufKotlinLite" }
 
 # Palette
 palette = { module = "androidx.palette:palette", version.ref = "paletteVersion" }
@@ -229,8 +240,9 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 
 # build-logic plugins
 acon-non-android-library = { id = "com.acon.non.android.library", version = "unspecified" }
@@ -245,6 +257,8 @@ acon-android-library-haze = { id = "com.acon.android.library.haze", version = "u
 acon-android-library-coil = { id = "com.acon.android.library.coil", version = "unspecified" }
 acon-android-library-naver-map = { id = "com.acon.android.library.naver.map", version = "unspecified" }
 acon-firebase = { id = "com.acon.firebase", version = "unspecified" }
+acon-feature-test = { id = "com.acon.feature.test", version = "unspecified"}
+acon-common-unit-test = { id = "com.acon.common.unit.test", version = "unspecified"}
 
 [bundles]
 googleSignIn = ["androidx-credentials", "androidx-credentials-play-services-auth", "googleid"]
@@ -258,6 +272,10 @@ coil = ["coil-compose", "coil-network-okhttp"]
 naver-map = ["naver-map-compose", "naver-map-location", "naver-map-sdk"]
 firebase = ["firebase-analytics-sdk", "firebase-crashlytics-sdk"]
 play-app-update = ["play-core", "play-core-ktx"]
-non-android-test = ["junit4", "kotlin-test", "mockk", "coroutine-test", "turbine", "junit5-api", "junit5-params"]
-junit5-runtime = ["junit5-runtime-engine", "junit5-runtime-vintage-engine"]
+
 android-test = ["androidx-junit", "androidx-espresso-core", "androidx-ui-test-junit4"]
+orbit-test = ["orbit-test"]
+kotest = ["kotest-runner", "kotest-property", "kotest-assertions"]
+test-coroutine = ["coroutine-test", "turbine"]
+test-unit = ["junit4", "kotlin-test", "junit5-api", "junit5-params"]
+test-runtime = ["junit5-runtime-engine", "junit5-runtime-vintage-engine"]

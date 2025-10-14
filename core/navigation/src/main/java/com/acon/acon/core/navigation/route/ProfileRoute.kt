@@ -8,10 +8,10 @@ interface ProfileRoute {
     data object Graph : ProfileRoute
 
     @Serializable
-    data object Profile : ProfileRoute
+    data object ProfileInfo : ProfileRoute
 
     @Serializable
-    data class ProfileMod(val photoId: String?) : ProfileRoute
+    data object ProfileUpdate : ProfileRoute
 
     @Serializable
     data object Bookmark : ProfileRoute
